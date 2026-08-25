@@ -1,0 +1,2757 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Povstanie 44 — Interaktívna mapa Slovenského národného povstania</title>
+<meta name="description" content="Interaktívna mapa a časová os Slovenského národného povstania (29. aug. – 30. okt. 1944): front deň po dni, velitelia, taktické skupiny, partizáni, vypálené obce, geopolitický kontext aj osobnosti SNP. Kompletný vzdelávací prehľad zadarmo.">
+<meta name="author" content="Povstanie44.sk">
+<link rel="canonical" href="https://povstanie44.sk/">
+
+<!-- Open Graph (Facebook, LinkedIn, WhatsApp...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Povstanie 44">
+<meta property="og:title" content="Povstanie 44 — Interaktívna mapa Slovenského národného povstania">
+<meta property="og:description" content="Front deň po dni, velitelia, taktické skupiny, partizáni, vypálené obce aj geopolitický kontext SNP 1944 — na jednej interaktívnej mape.">
+<meta property="og:url" content="https://povstanie44.sk/">
+<meta property="og:locale" content="sk_SK">
+<!-- Poznámka: og:image zatiaľ chýba — po nasadení na hosting doplňte
+     absolútnu URL screenshotu mapy (odporúčané 1200×630 px), napr.:
+<meta property="og:image" content="https://povstanie44.sk/og-image.jpg"> -->
+
+<!-- Twitter / X card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Povstanie 44 — Interaktívna mapa SNP">
+<meta name="twitter:description" content="Front deň po dni, velitelia, taktické skupiny, partizáni aj geopolitický kontext Slovenského národného povstania 1944.">
+
+<!-- Favicon: zjednodušený slovenský dvojkríž na trojvrší, rovnaký motív
+     ako emblémy jednotiek na mape -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%2315150f'/%3E%3Cpath d='M4,21 Q4,14.6 8.1,14.6 Q8.1,10.1 12,10.1 Q15.9,10.1 15.9,14.6 Q20,14.6 20,21 Z' fill='%23dab766'/%3E%3Crect x='10.6' y='2' width='1.8' height='15.2' fill='%23dab766'/%3E%3Crect x='6.8' y='5.1' width='9.4' height='1.8' fill='%23dab766'/%3E%3Crect x='7.8' y='9.5' width='7.4' height='1.8' fill='%23dab766'/%3E%3C/svg%3E">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+
+:root{
+  --ink:#15150f;
+  --ink-2:#1d1d15;
+  --parchment:#e9e1c9;
+  --parchment-dim:#c9c0a3;
+  --front-red:#9a3324;
+  --front-red-glow: rgba(154,51,36,.35);
+  --brass:#b6913f;
+  --brass-bright:#dab766;
+  --partisan-teal:#3f6461;
+  --partisan-teal-bright:#63938e;
+  --slate:#54513f;
+  --line-soft: rgba(233,225,201,.15);
+  --line-softer: rgba(233,225,201,.07);
+  --font-display: 'Spectral', serif;
+  --font-body: 'Source Sans 3', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(ellipse at 20% -10%, rgba(182,145,63,.08), transparent 45%),
+    radial-gradient(ellipse at 100% 110%, rgba(63,100,97,.10), transparent 50%),
+    var(--ink);
+  color:var(--parchment);
+  font-family:var(--font-body);
+  min-height:100vh;
+}
+
+.app{
+  max-width:1440px;
+  margin:0 auto;
+  padding:28px 28px 40px;
+}
+
+/* ---------- HEADER ---------- */
+header.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:24px;
+  border-bottom:1px solid var(--line-soft);
+  padding-bottom:18px;
+  margin-bottom:22px;
+  flex-wrap:wrap;
+}
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--brass-bright);
+  margin:0 0 6px;
+}
+h1{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:clamp(28px,4vw,44px);
+  margin:0;
+  line-height:1.05;
+  letter-spacing:.2px;
+}
+h1 em{
+  font-style:italic;
+  color:var(--front-red);
+  font-weight:600;
+}
+.top-meta{
+  font-family:var(--font-mono);
+  font-size:12px;
+  color:var(--parchment-dim);
+  text-align:right;
+  line-height:1.7;
+  max-width:280px;
+}
+
+/* ---------- LAYOUT ---------- */
+/* ---------- NAVIGATION & PAGES ---------- */
+.site-nav{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:22px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--line-soft);
+}
+.nav-btn{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  background:transparent;
+  border:1px solid var(--line-soft);
+  color:var(--parchment-dim);
+  padding:8px 14px;
+  border-radius:20px;
+  cursor:pointer;
+  transition:all .15s ease;
+  white-space:nowrap;
+}
+.nav-btn:hover{
+  border-color:var(--brass);
+  color:var(--brass-bright);
+}
+.nav-btn.active{
+  background:var(--brass);
+  border-color:var(--brass);
+  color:#15150f;
+  font-weight:600;
+}
+
+.page{display:none;}
+.page.active{display:block;}
+
+.article-page{
+  max-width:900px;
+  margin:0 auto;
+  animation:fadeIn .3s ease;
+}
+.article-page-inner{padding-bottom:20px;}
+.page-title{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-style:italic;
+  font-size:clamp(24px,3vw,34px);
+  margin:0 0 8px;
+  color:var(--parchment);
+}
+.page-intro{
+  font-size:14.5px;
+  line-height:1.7;
+  color:#ddd4b8;
+  max-width:640px;
+  margin:0 0 30px;
+}
+.section-heading{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--brass-bright);
+  margin:38px 0 16px;
+  padding-bottom:8px;
+  border-bottom:1px dashed var(--line-soft);
+}
+.section-heading:first-of-type{margin-top:0;}
+
+.article-card{
+  position:relative;
+  background:linear-gradient(180deg, var(--ink-2), var(--ink));
+  border:1px solid var(--line-soft);
+  border-radius:6px;
+  padding:22px 24px;
+  margin-bottom:18px;
+  transition:box-shadow .4s ease, border-color .4s ease;
+  scroll-margin-top:24px;
+}
+.article-card.flash{
+  border-color:var(--brass-bright);
+  box-shadow:0 0 0 3px rgba(219,183,102,.25);
+}
+.article-card .card-head-row{margin-top:2px;}
+.goto-map-btn, .goto-article-btn{
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  letter-spacing:.04em;
+  background:transparent;
+  border:1px solid var(--brass);
+  color:var(--brass-bright);
+  padding:6px 12px;
+  border-radius:16px;
+  cursor:pointer;
+  margin-top:14px;
+  transition:background .15s ease;
+}
+.goto-map-btn:hover, .goto-article-btn:hover{background:rgba(182,145,63,.15);}
+
+.full-timeline{
+  list-style:none;
+  margin:0; padding:0;
+  border-left:2px solid var(--line-soft);
+}
+.full-timeline li{
+  position:relative;
+  padding:0 0 22px 26px;
+  margin-left:2px;
+}
+.full-timeline li::before{
+  content:"";
+  position:absolute;
+  left:-6px; top:3px;
+  width:10px; height:10px;
+  border-radius:50%;
+  background:var(--front-red);
+  border:2px solid var(--ink);
+}
+.ft-date{
+  display:block;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--brass-bright);
+  margin-bottom:4px;
+}
+.ft-text{
+  font-size:13.5px;
+  line-height:1.6;
+  color:#ddd4b8;
+}
+
+.sources-list{
+  list-style:none;
+  margin:0 0 24px; padding:0;
+}
+.sources-list li{
+  padding:8px 0;
+  border-bottom:1px solid var(--line-softer);
+  font-size:13.5px;
+  color:#ddd4b8;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns: minmax(0,1.62fr) minmax(300px, 0.9fr);
+  gap:20px;
+}
+@media (max-width: 980px){
+  .layout{grid-template-columns:1fr;}
+}
+
+.panel{
+  background:linear-gradient(180deg, var(--ink-2), var(--ink));
+  border:1px solid var(--line-soft);
+  border-radius:4px;
+  position:relative;
+}
+
+/* ---------- MAP PANEL ---------- */
+.map-panel{
+  padding:16px 16px 0;
+  overflow:hidden;
+}
+.map-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.phase-label{
+  font-family:var(--font-display);
+  font-style:italic;
+  font-size:15px;
+  color:var(--brass-bright);
+}
+.legend{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  color:var(--parchment-dim);
+}
+.legend span{display:inline-flex;align-items:center;gap:5px;}
+.legend span[data-type]{
+  cursor:pointer;
+  padding:3px 7px;
+  border-radius:12px;
+  border:1px solid transparent;
+  transition:background .15s ease, border-color .15s ease, opacity .15s ease;
+}
+.legend span[data-type]:hover{border-color:var(--line-soft); background:rgba(255,255,255,.03);}
+.legend span[data-type].legend-off{
+  opacity:.32;
+  text-decoration:line-through;
+}
+.legend-hint{opacity:.65; font-style:italic;}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;}
+.dot.cmd{background:var(--brass-bright);box-shadow:0 0 0 2px rgba(219,183,102,.25)}
+.dot.ts{background:var(--parchment);border:2px solid var(--slate);}
+.dot.pz{background:var(--partisan-teal-bright);}
+.dot.de{background:#7d7d7d;}
+.line-sw{width:16px;height:2px;background:var(--front-red);display:inline-block;}
+
+.map-wrap{
+  position:relative;
+  border-top:1px solid var(--line-softer);
+  border-radius:2px;
+  overflow:hidden;
+  background:#100f0a;
+}
+#leafletMap{
+  width:100%;
+  height:560px;
+  background:#100f0a;
+  font-family:var(--font-body);
+}
+@media (max-width:700px){
+  #leafletMap{height:420px;}
+}
+
+/* jemné stmavenie/zafarbenie OSM dlaždíc, aby ladili s ostatným dizajnom */
+.tile-darken{
+  position:absolute; inset:0;
+  background:
+    linear-gradient(180deg, rgba(21,21,15,.20), rgba(21,21,15,.38)),
+    rgba(20,20,14,.28);
+  mix-blend-mode:multiply;
+  pointer-events:none;
+  z-index:399;
+}
+.leaflet-container{
+  background:#100f0a;
+  font-family:var(--font-body);
+}
+.leaflet-control-attribution{
+  background:rgba(20,20,14,.75) !important;
+  color:var(--parchment-dim) !important;
+  font-family:var(--font-mono);
+  font-size:9.5px;
+}
+.leaflet-control-attribution a{color:var(--brass-bright) !important;}
+.leaflet-control-zoom a{
+  background:rgba(20,20,14,.85) !important;
+  color:var(--parchment) !important;
+  border-color:var(--slate) !important;
+}
+.leaflet-control-zoom a:hover{background:rgba(182,145,63,.25) !important;}
+
+.territory-popup .leaflet-popup-content-wrapper{
+  background:linear-gradient(180deg, #24231a, #17160f);
+  color:var(--parchment);
+  border:1px solid var(--brass);
+  border-radius:6px;
+  box-shadow:0 12px 30px rgba(0,0,0,.5);
+}
+.territory-popup .leaflet-popup-content{
+  font-family:var(--font-body);
+  font-size:12.5px;
+  line-height:1.55;
+  margin:12px 14px;
+}
+.territory-popup .leaflet-popup-content strong{
+  font-family:var(--font-display);
+  font-style:italic;
+  font-size:14px;
+  color:var(--brass-bright);
+  display:block;
+  margin-bottom:4px;
+}
+.territory-popup .tp-note{
+  display:block;
+  margin-top:6px;
+  font-family:var(--font-mono);
+  font-size:10px;
+  color:var(--parchment-dim);
+  opacity:.8;
+  line-height:1.5;
+}
+.territory-popup .leaflet-popup-tip{
+  background:#17160f;
+  border:1px solid var(--brass);
+}
+.territory-popup .leaflet-popup-close-button{
+  color:var(--parchment-dim) !important;
+}
+
+/* ---------- MAP POPUP (modal cez mapu) ---------- */
+.map-modal-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(9,9,6,.62);
+  backdrop-filter:blur(2px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease;
+  z-index:900;
+}
+.map-modal-backdrop.open{
+  opacity:1;
+  pointer-events:auto;
+}
+.map-modal{
+  position:relative;
+  width:min(460px, 100%);
+  max-height:100%;
+  overflow-y:auto;
+  background:linear-gradient(180deg, #24231a, #17160f);
+  border:1px solid var(--brass);
+  border-radius:6px;
+  padding:24px 26px 22px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.3);
+  transform:translateY(10px) scale(.97);
+  transition:transform .2s ease;
+}
+.map-modal-backdrop.open .map-modal{
+  transform:translateY(0) scale(1);
+}
+.map-modal::-webkit-scrollbar{width:5px;}
+.map-modal::-webkit-scrollbar-thumb{background:var(--slate); border-radius:3px;}
+.map-modal .close-x{
+  top:12px; right:14px;
+}
+.map-modal .info-title{font-size:24px;}
+.map-modal .info-body{color:#e2d9bd;}
+
+/* ---------- ZNAČKY (Leaflet divIcon) ---------- */
+.lm-icon-wrap{background:transparent; border:none;}
+.lm-wrap{
+  position:relative;
+  width:150px; height:100%;
+  pointer-events:none;
+  transition:opacity .3s ease;
+}
+.lm-shape{
+  position:absolute;
+  left:0; top:50%;
+  width:var(--s); height:var(--s);
+  transform:translateY(-50%);
+  background:var(--f);
+  border:2px solid var(--c);
+  box-shadow:0 0 0 3px rgba(0,0,0,.25);
+  cursor:pointer;
+  pointer-events:auto;
+  transition:transform .15s ease, box-shadow .15s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:visible;
+}
+.lm-shape svg{display:block; flex:none;}
+.lm-circle{border-radius:50%;}
+.lm-diamond{transform:translateY(-50%) rotate(45deg); border-radius:2px;}
+.lm-square{border-radius:2px; border-style:dashed;}
+.lm-wrap:hover .lm-shape{box-shadow:0 0 0 6px rgba(219,183,102,.28);}
+.lm-selected .lm-shape{box-shadow:0 0 0 5px rgba(255,255,255,.55) !important;}
+.lm-inactive{opacity:.28;}
+.lm-inactive .lm-shape{pointer-events:none;}
+.lm-label{
+  position:absolute;
+  left:calc(var(--s, 16px) + 8px);
+  top:50%;
+  transform:translateY(-50%);
+  font-family:var(--font-mono);
+  font-size:10px;
+  color:var(--parchment-dim);
+  white-space:nowrap;
+  pointer-events:none;
+  text-shadow:0 1px 3px rgba(0,0,0,.9), 0 0 6px rgba(0,0,0,.7);
+}
+
+.town-ctx-label{
+  font-family:var(--font-mono);
+  font-size:8.5px;
+  color:rgba(233,225,201,.55);
+  white-space:nowrap;
+  text-shadow:0 1px 2px rgba(0,0,0,.8);
+}
+
+.hist-toggle{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  color:var(--parchment-dim);
+  cursor:pointer;
+  user-select:none;
+}
+.hist-toggle input{
+  accent-color:var(--brass);
+  cursor:pointer;
+}
+
+.territory-legend{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  color:var(--parchment-dim);
+  width:100%;
+  margin-top:2px;
+}
+.territory-legend span{display:inline-flex; align-items:center; gap:5px;}
+.territory-legend .sw{
+  width:14px; height:9px;
+  border-radius:2px;
+  display:inline-block;
+  flex:none;
+}
+
+.hist-label-icon{pointer-events:none;}
+.hist-label{
+  text-align:center;
+  pointer-events:none;
+  width:230px;
+}
+.hist-label .h-title{
+  font-family:var(--font-display);
+  font-style:italic;
+  font-weight:600;
+  font-size:13px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:rgba(233,225,201,.42);
+  text-shadow:0 1px 5px rgba(0,0,0,.85), 0 0 10px rgba(0,0,0,.6);
+}
+.hist-label.home .h-title{
+  color:rgba(219,183,102,.6);
+}
+.hist-label .h-sub{
+  font-family:var(--font-mono);
+  font-size:8.5px;
+  color:rgba(233,225,201,.3);
+  margin-top:3px;
+  text-shadow:0 1px 4px rgba(0,0,0,.85);
+}
+.territory-path{
+  transition:opacity .35s ease, fill-opacity .35s ease;
+}
+
+
+/* ---------- TIMELINE ---------- */
+.timeline-bar{
+  padding:14px 16px 18px;
+  border-top:1px solid var(--line-softer);
+  margin-top:8px;
+}
+.tl-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.play-btn{
+  flex:none;
+  width:38px;height:38px;
+  border-radius:50%;
+  border:1px solid var(--brass);
+  background:transparent;
+  color:var(--brass-bright);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+  transition:background .15s ease;
+}
+.play-btn:hover{background:rgba(182,145,63,.15);}
+
+.tl-controls{
+  flex:none;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.step-btn{
+  flex:none;
+  width:30px;height:30px;
+  border-radius:50%;
+  border:1px solid var(--slate);
+  background:transparent;
+  color:var(--parchment-dim);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;
+  transition:background .15s ease, color .15s ease, border-color .15s ease;
+}
+.step-btn:hover{
+  background:rgba(182,145,63,.12);
+  color:var(--brass-bright);
+  border-color:var(--brass);
+}
+
+.tl-row-secondary{
+  margin-top:12px;
+  gap:22px;
+  flex-wrap:wrap;
+}
+.tl-option{
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  color:var(--parchment-dim);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.tl-option select{
+  font-family:var(--font-mono);
+  font-size:11px;
+  background:var(--ink-2);
+  color:var(--parchment);
+  border:1px solid var(--slate);
+  border-radius:4px;
+  padding:4px 8px;
+  cursor:pointer;
+  text-transform:none;
+  letter-spacing:normal;
+}
+.tl-option select:hover{border-color:var(--brass);}
+.tl-option select:focus{outline:none; border-color:var(--brass-bright);}
+
+.tl-slider-wrap{flex:1; position:relative;}
+input[type=range]{
+  width:100%;
+  -webkit-appearance:none;
+  appearance:none;
+  height:3px;
+  background:linear-gradient(90deg, var(--front-red), var(--brass));
+  border-radius:2px;
+  outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:15px;height:15px;
+  border-radius:50%;
+  background:var(--parchment);
+  border:2px solid var(--front-red);
+  cursor:pointer;
+  margin-top:-1px;
+}
+input[type=range]::-moz-range-thumb{
+  width:13px;height:13px;border-radius:50%;
+  background:var(--parchment);border:2px solid var(--front-red);cursor:pointer;
+}
+
+.date-display{
+  flex:none;
+  font-family:var(--font-mono);
+  font-size:13px;
+  color:var(--parchment);
+  min-width:150px;
+  text-align:right;
+}
+.date-display .d-num{color:var(--brass-bright); font-weight:700;}
+
+.tl-ticks{
+  display:flex;
+  justify-content:space-between;
+  margin-top:6px;
+  font-family:var(--font-mono);
+  font-size:9px;
+  color:var(--parchment-dim);
+  opacity:.7;
+}
+.tl-milestones{position:relative; height:0;}
+.milestone-dot{
+  position:absolute;
+  top:-8px;
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--brass);
+  transform:translateX(-50%);
+  cursor:pointer;
+}
+.milestone-dot:hover{background:var(--brass-bright);}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar{display:flex; flex-direction:column; gap:16px;}
+
+.info-panel{
+  padding:20px;
+  min-height:230px;
+}
+.info-empty{
+  color:var(--parchment-dim);
+  font-family:var(--font-body);
+  font-size:13.5px;
+  line-height:1.65;
+  padding-top:6px;
+}
+.info-kicker{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+.info-kicker.cmd{color:var(--brass-bright);}
+.info-kicker.ts{color:var(--parchment);}
+.info-kicker.pz{color:var(--partisan-teal-bright);}
+.info-kicker.de{color:#9c9c9c;}
+.info-kicker.govt{color:#c1504a;}
+.info-kicker.vsa{color:#7fa0bd;}
+.info-kicker.town{color:#cbb97a;}
+.info-kicker.airfield{color:#7ec8e3;}
+.info-kicker.burned{color:#c1602f;}
+.info-kicker.exec{color:#a35a5a;}
+.info-title{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:22px;
+  line-height:1.15;
+  margin:0 0 4px;
+}
+.info-sub{
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  color:var(--parchment-dim);
+  margin-bottom:12px;
+}
+.info-body{
+  font-size:13.5px;
+  line-height:1.68;
+  color:#ddd4b8;
+}
+.info-body p{margin:0 0 10px;}
+.info-dates{
+  display:inline-block;
+  margin-top:10px;
+  padding:4px 9px;
+  border:1px solid var(--line-soft);
+  border-radius:20px;
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  color:var(--parchment-dim);
+}
+.info-sources{
+  margin-top:14px;
+  padding-top:10px;
+  border-top:1px dashed var(--line-soft);
+  font-family:var(--font-mono);
+  font-size:10px;
+  line-height:1.6;
+  color:var(--parchment-dim);
+  opacity:.85;
+}
+.card-head-row{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  margin-bottom:2px;
+}
+.card-head-text{flex:1; min-width:0;}
+.info-thumb{
+  flex:none;
+  width:56px; height:56px;
+  border-radius:6px;
+  overflow:hidden;
+  border:1px solid var(--line-soft);
+  background:#0e0d09;
+}
+.info-thumb img{
+  width:100%; height:100%;
+  object-fit:cover;
+  object-position:top center;
+  display:block;
+  filter:grayscale(25%) sepia(8%) contrast(1.02);
+}
+.info-photo-credit-line{
+  font-family:var(--font-mono);
+  font-size:9px;
+  color:var(--parchment-dim);
+  opacity:.7;
+  margin:0 0 12px;
+}
+.info-photo-credit-line a{color:var(--brass-bright); text-decoration:none;}
+.info-photo-credit-line a:hover{text-decoration:underline;}
+.close-x{
+  position:absolute;
+  top:14px; right:16px;
+  background:none;border:none;
+  color:var(--parchment-dim);
+  font-family:var(--font-mono);
+  font-size:12px;
+  cursor:pointer;
+}
+.close-x:hover{color:var(--parchment);}
+
+.feed-panel{
+  padding:18px 20px 20px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-height:260px;
+}
+.feed-title{
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--brass-bright);
+  margin:0 0 12px;
+  display:flex;
+  justify-content:space-between;
+}
+.feed-list{
+  list-style:none;
+  margin:0;padding:0;
+  overflow-y:auto;
+  max-height:360px;
+  flex:1;
+}
+.feed-list::-webkit-scrollbar{width:5px;}
+.feed-list::-webkit-scrollbar-thumb{background:var(--slate); border-radius:3px;}
+.feed-item{
+  padding:9px 0;
+  border-bottom:1px solid var(--line-softer);
+  font-size:12.5px;
+  line-height:1.5;
+  color:#d8cfb2;
+  animation: fadeIn .35s ease;
+}
+.feed-item:last-child{border-bottom:none;}
+.feed-item .fd-date{
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  color:var(--front-red);
+  display:block;
+  margin-bottom:2px;
+}
+@keyframes fadeIn{from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:translateY(0);}}
+
+.legend-panel{
+  padding:16px 20px;
+  font-size:12px;
+  color:var(--parchment-dim);
+  line-height:1.6;
+}
+.legend-panel b{color:var(--parchment);}
+
+footer.note{
+  margin-top:20px;
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  color:var(--parchment-dim);
+  line-height:1.7;
+  border-top:1px solid var(--line-softer);
+  padding-top:14px;
+  opacity:.75;
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div>
+      <p class="eyebrow">29. AUGUST — 30. OKTÓBER 1944 · CELÉ SLOVENSKO</p>
+      <h1>Slovenské národné <em>povstanie</em></h1>
+    </div>
+    <div class="top-meta">
+      Interaktívna mapa frontu, veliteľov,<br>
+      taktických skupín a partizánskych oddielov.<br>
+      Posuňte časovú os alebo kliknite na značku.
+    </div>
+  </header>
+
+  <nav class="site-nav" id="siteNav">
+    <button class="nav-btn active" data-page="map">Mapa a časová os</button>
+    <button class="nav-btn" data-page="prologue">Pozadie a príčiny</button>
+    <button class="nav-btn" data-page="command">Velenie a štát</button>
+    <button class="nav-btn" data-page="personalities">Osobnosti SNP</button>
+    <button class="nav-btn" data-page="tactical">Taktické skupiny</button>
+    <button class="nav-btn" data-page="partisans">Partizáni a Nemci</button>
+    <button class="nav-btn" data-page="places">Mestá a letiská</button>
+    <button class="nav-btn" data-page="reprisals">Represálie</button>
+    <button class="nav-btn" data-page="aftermath">Bilancia a dôsledky</button>
+    <button class="nav-btn" data-page="memory">Pamäť dnes</button>
+    <button class="nav-btn" data-page="timeline">Chronológia</button>
+    <button class="nav-btn" data-page="glossary">Slovníček pojmov</button>
+    <button class="nav-btn" data-page="sources">Zdroje</button>
+  </nav>
+
+  <section class="page active" id="page-map">
+  <div class="layout">
+
+    <!-- MAP -->
+    <div class="panel map-panel">
+      <div class="map-head">
+        <div class="phase-label" id="phaseLabel">Počiatočné povstalecké územie</div>
+        <label class="hist-toggle">
+          <input type="checkbox" id="histToggle" checked>
+          Susedné štáty (1944)
+        </label>
+        <label class="hist-toggle">
+          <input type="checkbox" id="germanOccToggle" checked>
+          Nemecká okupácia
+        </label>
+        <label class="hist-toggle">
+          <input type="checkbox" id="easternFrontToggle" checked>
+          Východný front (Dukla)
+        </label>
+        <div class="territory-legend">
+          <span><i class="sw" style="background:#f2ede0;border:1.5px solid #dab766;"></i>Povstalecké územie</span>
+          <span><i class="sw" style="background:#4a7ab8;"></i>Sovietsky postup (Dukla)</span>
+          <span><i class="sw" style="background:#7a2420;"></i>Nemecká okupácia</span>
+        </div>
+        <div class="legend" id="legendFilter">
+          <span data-type="cmd"><i class="dot cmd"></i>Velenie</span>
+          <span data-type="ts"><i class="dot ts"></i>Taktická skupina</span>
+          <span data-type="pz"><i class="dot pz"></i>Partizáni</span>
+          <span data-type="de"><i class="dot de"></i>Nemecké jednotky</span>
+          <span data-type="govt"><i class="dot govt" style="background:#b5453f"></i>Vedenie štátu</span>
+          <span data-type="vsa"><i class="dot vsa" style="background:#6f8fae"></i>Vých. armáda</span>
+          <span data-type="town"><i class="dot town" style="background:#cbb97a"></i>Dôležité mesto</span>
+          <span data-type="airfield"><i class="dot" style="background:#7ec8e3"></i>Letisko</span>
+          <span data-type="burned"><i class="dot" style="background:#c1602f"></i>Vypálená obec</span>
+          <span data-type="exec"><i class="dot" style="background:#7a2a2a"></i>Miesto popravy</span>
+          <span data-type="person"><i class="dot" style="background:#a690c4"></i>Osobnosť SNP</span>
+          <span class="legend-hint">Klik na farebné územie = vysvetlenie · klik na ikonku vyššie = filter</span>
+        </div>
+      </div>
+
+      <div class="map-wrap">
+        <div id="leafletMap"></div>
+
+        <div class="map-modal-backdrop" id="mapModalBackdrop">
+          <div class="map-modal" id="mapModal"></div>
+        </div>
+      </div>
+
+
+      <div class="timeline-bar">
+        <div class="tl-row">
+          <div class="tl-controls">
+            <button class="step-btn" id="stepWeekBack" title="O týždeň dozadu">«</button>
+            <button class="step-btn" id="stepDayBack" title="O deň dozadu">‹</button>
+            <button class="play-btn" id="playBtn" title="Spustiť / zastaviť priebeh">▶</button>
+            <button class="step-btn" id="stepDayFwd" title="O deň dopredu">›</button>
+            <button class="step-btn" id="stepWeekFwd" title="O týždeň dopredu">»</button>
+          </div>
+          <div class="tl-slider-wrap">
+            <input type="range" id="dateSlider" min="0" max="60" value="0" step="1">
+            <div class="tl-milestones" id="milestones"></div>
+          </div>
+          <div class="date-display" id="dateDisplay">29. <span class="d-num">august</span> 1944</div>
+        </div>
+        <div class="tl-ticks">
+          <span>29. aug</span><span>10. sept</span><span>27. sept</span><span>13. okt</span><span>30. okt</span>
+        </div>
+        <div class="tl-row tl-row-secondary">
+          <label class="tl-option">Rýchlosť
+            <select id="speedSelect">
+              <option value="900">Pomaly</option>
+              <option value="500" selected>Stredne</option>
+              <option value="220">Rýchlo</option>
+            </select>
+          </label>
+          <label class="tl-option">Krok prehrávania
+            <select id="stepSelect">
+              <option value="1" selected>po dňoch</option>
+              <option value="7">po týždňoch</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="panel info-panel" id="infoPanel">
+        <div class="info-empty" id="infoEmpty">
+          Kliknite na ktorúkoľvek značku na mape — veliteľa, taktickú skupinu, partizánsky oddiel či nemeckú jednotku — a zobrazí sa tu jej príbeh, dátumy pôsobenia a súvislosti.
+        </div>
+      </div>
+
+      <div class="panel feed-panel">
+        <p class="feed-title"><span>Denník udalostí</span><span id="feedCount">0</span></p>
+        <ul class="feed-list" id="feedList"></ul>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section class="page article-page" id="page-prologue"></section>
+  <section class="page article-page" id="page-command"></section>
+  <section class="page article-page" id="page-personalities"></section>
+  <section class="page article-page" id="page-tactical"></section>
+  <section class="page article-page" id="page-partisans"></section>
+  <section class="page article-page" id="page-places"></section>
+  <section class="page article-page" id="page-reprisals"></section>
+  <section class="page article-page" id="page-aftermath"></section>
+  <section class="page article-page" id="page-memory"></section>
+  <section class="page article-page" id="page-timeline"></section>
+  <section class="page article-page" id="page-glossary"></section>
+  <section class="page article-page" id="page-sources"></section>
+
+  <footer class="note">
+    Hranice frontu sú zjednodušené a orientačné — slúžia na pochopenie priebehu bojov, nie ako presná vojenská kartografia.
+    Polohy miest sú približné. Zdroje: Múzeum SNP, Ústav pamäti národa, Vojenský historický ústav, Wikipédia (Taktické skupiny počas SNP).
+    Za presným výskumom odporúčame múzeum SNP v Banskej Bystrici.
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ============================================================
+   DÁTOVÝ MODEL
+   ============================================================ */
+
+const D = (s)=> new Date(s+"T00:00:00");
+const START = D("1944-08-29");
+const END   = D("1944-10-30");
+const dayCount = Math.round((END-START)/86400000);
+
+function dateAt(idx){
+  const d = new Date(START.getTime()+idx*86400000);
+  return d;
+}
+function fmtDate(d){
+  const months=["januára","februára","marca","apríla","mája","júna","júla","augusta","septembra","októbra","novembra","decembra"];
+  return d.getDate()+". "+months[d.getMonth()]+" "+d.getFullYear();
+}
+function fmtShort(d){
+  const months=["jan","feb","mar","apr","máj","jún","júl","aug","sep","okt","nov","dec"];
+  return d.getDate()+". "+months[d.getMonth()];
+}
+function iso(d){ return d.toISOString().slice(0,10); }
+
+/* --- geografická projekcia (celé Slovensko) --- */
+const LAT_MIN=47.68, LAT_MAX=49.66, LON_MIN=16.78, LON_MAX=22.62, W=1000, H=520;
+function proj(lat,lon){
+  const x = (lon-LON_MIN)/(LON_MAX-LON_MIN)*W;
+  const y = (LAT_MAX-lat)/(LAT_MAX-LAT_MIN)*H;
+  return [Math.round(x),Math.round(y)];
+}
+/* pôvodná (staršia) projekcia iba pre stredné Slovensko — použitá pri ručnom
+   zostavovaní tvarov frontovej línie. Slúži len na prepočet tých bodov
+   do nových súradníc celoslovenskej mapy. */
+const OLD_LAT_MIN=48.2, OLD_LAT_MAX=49.55, OLD_LON_MIN=18.25, OLD_LON_MAX=20.65, OLD_W=1000, OLD_H=660;
+function invOldProj(x,y){
+  const lon = OLD_LON_MIN + (x/OLD_W)*(OLD_LON_MAX-OLD_LON_MIN);
+  const lat = OLD_LAT_MAX - (y/OLD_H)*(OLD_LAT_MAX-OLD_LAT_MIN);
+  return [lat,lon];
+}
+
+const TOWNS = [
+  ["Brezno",48.8058,19.6408],
+  ["Prievidza",48.7712,18.6229],
+  ["Handlová",48.7266,18.7539],
+  ["Telgárt",48.8483,20.1900],
+  ["Strečno",49.2214,18.8523],
+  ["Kráľova Lehota",49.0672,19.6931],
+  ["Kokava n. Rim.",48.5346,19.8351],
+  ["Tisovec",48.6798,19.9412],
+  ["Revúca",48.6828,20.1131],
+  ["Krupina",48.3549,19.0602],
+  ["Dolný Kubín",49.2103,19.2984],
+  ["L. Mikuláš",49.0819,19.6111],
+  ["Detva",48.5628,19.4197],
+  ["Nováky",48.7180,18.5591],
+  ["Trnava",48.3709,17.5886],
+  ["Nitra",48.3069,18.0764],
+  ["Žilina",49.2231,18.7394],
+  ["Humenné",48.9358,21.9098],
+  ["Bardejov",49.2939,21.2739],
+  ["Medzilaborce",49.2711,21.9061],
+  ["Svidník",49.3068,21.5686],
+  ["Giraltovce",49.1128,21.3775],
+];
+
+/* --- historické štáty a útvary okolo Slovenska v roku 1944 (kontextové, neklikateľné) --- */
+const HISTORICAL_LABELS = [
+  {
+    title:"Slovenský štát",
+    sub:"",
+    lat:48.98, lon:19.05,
+    home:true
+  },
+  {
+    title:"Maďarské kráľovstvo",
+    sub:"od Viedenskej arbitráže 1938 zahŕňalo aj juh a Košice",
+    lat:47.85, lon:19.95
+  },
+  {
+    title:"Protektorát Čechy a Morava",
+    sub:"nemecká okupačná správa od marca 1939",
+    lat:49.32, lon:17.05
+  },
+  {
+    title:"Nemecko (Ríša)",
+    sub:"Rakúsko (\"Ostmark\") pripojené 1938",
+    lat:48.05, lon:16.05
+  },
+  {
+    title:"Generálne gubernátorstvo",
+    sub:"okupované Poľsko",
+    lat:49.95, lon:20.55
+  },
+  {
+    title:"ZSSR",
+    sub:"postup Červenej armády — Karpatsko-duklianska operácia",
+    lat:49.42, lon:22.35
+  },
+];
+
+/* --- markery: velitelia, taktické skupiny, partizáni, Nemci --- */
+const P = (lat,lon)=>[lat,lon];
+
+const COMMANDERS = [
+  {
+    id:"golian", type:"cmd",
+    name:"Ján Golian",
+    role:"Veliteľ 1. čs. armády na Slovensku (do 6.10.1944, potom náčelník štábu)",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.7395,19.1535), hq:"Banská Bystrica → Podbrezová → hory",
+    photo:{file:"Ján Golian.jpg", credit:"Dobová fotografia, verejná doména · Wikimedia Commons"},
+    bio:[
+      "Podplukovník generálneho štábu Ján Golian od marca 1944 tajne pripravoval vojenský odboj na Slovensku na pokyn exilového prezidenta Edvarda Beneša.",
+      "29. augusta 1944 krátko po 20. hodine vydal heslo „Začnite s vysťahovaním!“ — signál na začiatok ozbrojeného odporu proti nemeckým jednotkám vstupujúcim na Slovensko.",
+      "Začiatkom októbra 1944 velenie prevzal armádny generál Rudolf Viest, Golian sa stal jeho náčelníkom štábu. Po páde Banskej Bystrice sa obaja pokúsili ustúpiť do hôr, boli zajatí a popravení v koncentračnom tábore Flossenbürg.",
+      "Povojnový osud: Golian bol popravený v koncentračnom tábore Flossenbürg v druhej polovici marca 1945, spolu s Viestom a ďalšími dvomi slovenskými generálmi (Jurechom a Malárom). In memoriam bol povýšený na brigádneho generála a po roku 1989 mu boli udelené najvyššie štátne vyznamenania."
+    ]
+  },
+  {
+    id:"viest", type:"cmd",
+    name:"Rudolf Viest",
+    role:"Veliteľ 1. čs. armády na Slovensku (od 7.10.1944)",
+    from:"1944-10-07", to:"1944-10-28",
+    loc:P(48.7395,19.1535), hq:"Banská Bystrica",
+    photo:{file:"Arm.gen. Rudolf Viest low.jpg", credit:"Ateliér Langhans, cca 1938 · verejná doména (PD-old) · Wikimedia Commons"},
+    bio:[
+      "Armádny generál Rudolf Viest, rodák z Revúcej, priletel zo západu na povstalecké územie a začiatkom októbra 1944 prevzal najvyššie velenie nad povstaleckou armádou.",
+      "Spolu s Golianom viedol obranu v jej najťažšej záverečnej fáze. Po páde Banskej Bystrice 27. – 28. októbra 1944 nariadil prechod na partizánsky spôsob boja.",
+      "Pri ústupe do hôr bol so štábom zajatý nemeckými jednotkami a popravený vo Flossenbürgu v druhej polovici marca 1945 — jediný armádny generál československej armády popravený počas druhej svetovej vojny. Bol jediným zo štyroch popravených slovenských generálov, ktorý predtým slúžil aj v pôvodnej čs. légii a medzivojnovej armáde."
+    ]
+  },
+  {
+    id:"smidke", type:"cmd",
+    name:"Karol Šmidke",
+    role:"Predseda SNR · veliteľ Hlavného štábu partizánskych oddielov",
+    from:"1944-09-07", to:"1944-10-28",
+    loc:P(48.7395,19.1535), hq:"Banská Bystrica",
+    photo:{file:"Karol Šmidke.png", credit:"Dobová fotografia · Wikimedia Commons"},
+    bio:[
+      "Predseda Komunistickej strany Slovenska a jeden z predsedov Slovenskej národnej rady. 7. septembra 1944 bol menovaný náčelníkom novozriadeného Hlavného štábu partizánskych oddielov, ktorý koordinoval partizánske jednotky so 1. čs. armádou.",
+      "Spolu s Golianom a sovietskym generálom Asmoľovom zasadal v Rade na obranu Slovenska — najvyššom koordinačnom orgáne povstania.",
+      "Povojnový osud: na rozdiel od popravených vojenských veliteľov sa Šmidke vojny dožil a zastával po nej vysoké stranícke a štátne funkcie v komunistickom Československu. Zomrel v roku 1952."
+    ]
+  },
+  {
+    id:"asmolov", type:"cmd",
+    name:"Alexej Nikitič Asmoľov",
+    role:"Veliteľ Hlavného štábu partizánskeho hnutia (sovietsky styčný dôstojník)",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.62,19.30), hq:"okolie Banskej Bystrice / hory",
+    bio:[
+      "Sovietsky generálmajor, vyslaný ako styčný dôstojník a neskôr zástupca veliteľa partizánskeho štábu, od 30. septembra 1944 stál na čele Hlavného štábu partizánskeho hnutia v Československu.",
+      "Zabezpečoval prepojenie povstaleckých partizánskych jednotiek s Ukrajinským štábom partizánskeho hnutia v Kyjeve a s velením Červenej armády.",
+      "Povojnový osud: na rozdiel od mnohých slovenských veliteľov sa ako sovietsky dôstojník po potlačení SNP vrátil do ZSSR a jeho ďalšia kariéra pokračovala mimo Československa."
+    ]
+  },
+  {
+    id:"ferjencik", type:"cmd",
+    name:"Mikuláš Ferjenčík",
+    role:"Delegát SNR v Moskve · člen Rady na obranu Slovenska",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.80,19.05), hq:"Banská Bystrica",
+    bio:[
+      "Podplukovník generálneho štábu, ktorý spolu s Karolom Šmidkem odletel v auguste 1944 do Moskvy ako delegácia SNR s cieľom koordinovať povstalecké akcie s velením Červenej armády.",
+      "Neskôr pôsobil ako člen Rady na obranu Slovenska, ktorá riadila obranu povstaleckého územia.",
+      "Povojnový osud: po vojne pôsobil vo vysokých vojenských funkciách obnovenej československej armády, no po komunistickom prevrate vo februári 1948 upadol do nemilosti nového režimu a napokon emigroval na Západ."
+    ]
+  }
+];
+
+const TACTICAL_GROUPS = [
+  {
+    id:"ts1", type:"ts", number:"I.",
+    name:"I. taktická skupina „Kriváň“",
+    commander:"pplk. Jozef Tlach",
+    from:"1944-09-10", to:"1944-10-27",
+    loc:P(48.7395,19.1535), hq:"Banská Bystrica, neskôr Harmanec",
+    bio:[
+      "Vznikla reorganizáciou povstaleckého vojska 10. septembra 1944 pod krycím menom „Kriváň“. Bránila prístupy do centra povstania od Turca, Liptova, Horehronia a Zvolena.",
+      "Tvorilo ju šesť práporov 1. pešieho pluku, samostatná rota, delostrelecká skupina (21., 22., 31. a 41. batéria) a spojovacia rota — spolu približne 4 000 mužov.",
+      "Začiatkom októbra viedla ťažké boje pri Čremošnom a Malom Šturci proti nemeckej divízii Tatra, kde sa vyznamenala posádka improvizovaného obrneného vlaku Hurban."
+    ]
+  },
+  {
+    id:"ts2", type:"ts", number:"II.",
+    name:"II. taktická skupina „Fatra“",
+    commander:"plk. Michal Širica",
+    from:"1944-09-10", to:"1944-10-27",
+    loc:P(48.8058,19.6408), hq:"Brezno nad Hronom",
+    bio:[
+      "Zabezpečovala obranu smerov Kráľova Lehota – Čertovica – Brezno – Hranovnica – Telgárt a Kokava nad Rimavicou – Klenovec – Tisovec – Revúca, teda celé východné krídlo povstaleckého územia popri toku Hrona.",
+      "Po 10. septembri úspešne udržala svoj úsek pri Telgárte a medzi Kráľovou Lehotou a sedlom Čertovica aj v druhej etape bojov."
+    ]
+  },
+  {
+    id:"ts3", type:"ts", number:"III.",
+    name:"III. taktická skupina „Gerlach“",
+    commander:"plk. Štefan Kuna",
+    from:"1944-09-10", to:"1944-10-27",
+    loc:P(48.5763,19.1338), hq:"Zvolen",
+    bio:[
+      "Vznikla z jednotiek pešieho pluku 3 Zvolen a pešieho pluku 1, ktorý ustúpil na povstalecké územie z Trnavy. Doplnili ju mobilizovaní záložníci, delostrelecké, ženijné a spojovacie jednotky aj jednotky útočnej vozby.",
+      "Zodpovedala za obranu najväčšieho územia a bola jednoznačne najsilnejšou z povstaleckých taktických skupín — kľúčová pre obranu juhu okolo Zvolena a Krupiny.",
+      "Na začiatku druhej etapy bojov (po 10. septembri) čelila zosilnenému práporu 14. divízie SS Galizien."
+    ]
+  },
+  {
+    id:"ts4", type:"ts", number:"IV.",
+    name:"IV. taktická skupina „Muráň“",
+    commander:"plk. Mikuláš Markus",
+    from:"1944-09-14", to:"1944-10-23",
+    loc:P(48.7712,18.6229), hq:"okolie Prievidze / Nováky",
+    bio:[
+      "Velil jej plukovník Mikuláš Markus od 14. septembra do 23. októbra 1944. Skupina čelila silnej nemeckej bojovej skupine Schill na západnom krídle frontu.",
+      "Od začiatku druhej etapy povstania (po 10. septembri) bola jej bojová situácia najťažšia zo všetkých taktických skupín — po prelomení obrany pri Zemianskych Kostoľanoch sa musela stiahnuť k Novákom, kde sa jej nepodarilo Nemcov zastaviť."
+    ]
+  },
+  {
+    id:"ts5", type:"ts", number:"V.",
+    name:"V. taktická skupina „Ďumbier“",
+    commander:"pplk. Emil Perko",
+    from:"1944-09-10", to:"1944-10-27",
+    loc:P(49.2214,18.8523), hq:"Strečno",
+    bio:[
+      "Vznikla z jednotiek, ktoré začiatkom septembra 1944 bránili Strečniansku tiesňavu proti postupu nemeckej tankovej divízie Tatra.",
+      "Postupne musela aktivovať aj ďalšie obranné úseky. V októbri sa zmenila na výcvikovú a záložnú skupinu, keďže sa ťažisko bojov presunulo inam."
+    ]
+  },
+  {
+    id:"ts6", type:"ts", number:"VI.",
+    name:"VI. taktická skupina „Zobor“",
+    commander:"pplk. Ján Černek",
+    from:"1944-09-10", to:"1944-10-27",
+    loc:P(49.0775,19.3096), hq:"Ružomberok",
+    bio:[
+      "Vznikla z jednotiek ružomberskej posádky, z jednotiek, ktorým sa podarilo ustúpiť z Liptova, a z mobilizovaných záložníkov.",
+      "V druhej etape bojov (po 10. septembri) sa jej podarilo zastaviť nemecké jednotky a skonsolidovať obranu v priestore Biely Potok južne od Ružomberka."
+    ]
+  }
+];
+
+const PARTISANS = [
+  {
+    id:"capajev", type:"pz",
+    name:"Partizánsky zväzok Čapajev",
+    commander:"mjr. Kokin",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.90,20.90) /*mimo mapy - presunieme dnu*/, hq:"pôvodne východné Slovensko (Slanské vrchy), neskôr presun na povstalecké územie",
+    bio:[
+      "Vznikol z hanušovskej odbojovej skupiny na východnom Slovensku, ktorá sa spojila so skupinou Pugačov z Vihorlatu. Vedenie prebral major Kokin, sovietsky dôstojník.",
+      "Bol jedným z najvýznamnejších sovietsko-slovenských partizánskych zväzkov, previazaný s prípravným odbojom Karola Šmidkeho a Vojtecha Borovského ešte pred vypuknutím povstania."
+    ]
+  },
+  {
+    id:"nevskij", type:"pz",
+    name:"Partizánsky zväzok Alexej Nevskij",
+    commander:"velenie sovietsko-slovenské",
+    from:"1944-09-10", to:"1944-10-28",
+    loc:P(48.75,19.30), hq:"Kordíky → Krupina",
+    bio:[
+      "Po dvojtýždňovom presune cez hory z východného Slovenska sa zväzok dostal na povstalecké územie a usídlil sa pri obci Kordíky, odkiaľ sa neskôr presunul ku Krupine.",
+      "Patril medzi sovietsko-slovenské partizánske jednotky napojené na Hlavný štáb partizánskych oddielov v Banskej Bystrici."
+    ]
+  },
+  {
+    id:"asmolov-grp", type:"pz",
+    name:"Partizánska skupina „Asmolov“",
+    commander:"Jozef Grozaj",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.66,19.55), hq:"stredné Slovensko",
+    bio:[
+      "Jedna z partizánskych skupín pomenovaných po sovietskom veliteľovi A. N. Asmoľovovi, pôsobiaca na povstaleckom území pod velením Jozefa Grozaja."
+    ]
+  },
+  {
+    id:"gottwald", type:"pz",
+    name:"Partizánska brigáda Klement Gottwald",
+    commander:"—",
+    from:"1944-10-06", to:"1945-01-28",
+    loc:P(49.05,19.85), hq:"Liptovský Hrádok a okolie",
+    bio:[
+      "Po zatlačení organizovaného odporu do hôr koncom októbra 1944 sa do jej radov pripojili viacerí dôstojníci povstaleckej armády, ktorí prešli na partizánsky spôsob boja.",
+      "Pôsobila v okolí Liptovského Hrádku až do oslobodenia Popradu 28. januára 1945."
+    ]
+  }
+];
+// presunieme partizánske body, ktoré by ležali mimo viewboxu, do rozumnej polohy v rámci mapy
+PARTISANS[0].loc = P(48.95, 20.35);
+
+const GERMAN_GROUPS = [
+  {
+    id:"schill", type:"de",
+    name:"Bojová skupina „Schill“",
+    commander:"nemecké velenie",
+    from:"1944-09-10", to:"1944-10-27",
+    loc:P(48.7712,18.6229), hq:"Prievidza",
+    bio:[
+      "Nemecká bojová skupina útočiaca na západnom krídle frontu SNP. 11. septembra 1944 prelomila povstaleckú obranu pri Zemianskych Kostoľanoch a donútila IV. taktickú skupinu ustúpiť k Novákom.",
+      "V polovici septembra obsadila Prievidzu, čím vážne ohrozila západné krídlo povstaleckého územia."
+    ]
+  },
+  {
+    id:"schafer", type:"de",
+    name:"Armádna skupina „Schäfer“",
+    commander:"nemecké velenie",
+    from:"1944-09-01", to:"1944-10-27",
+    loc:P(49.2103,19.2984), hq:"Dolný Kubín",
+    bio:[
+      "Posilnená tankovými jednotkami dobyla Dolný Kubín a postupovala od severu smerom na Martin a Ružomberok, čím tlačila na severné krídlo povstaleckého frontu."
+    ]
+  },
+  {
+    id:"tatra", type:"de",
+    name:"Tanková divízia „Tatra“ (178. divízia)",
+    commander:"nemecké velenie",
+    from:"1944-09-01", to:"1944-10-27",
+    loc:P(49.10,19.05), hq:"Strečno → Martin → Banská Bystrica",
+    bio:[
+      "Postupovala od Strečnianskej tiesňavy smerom na juh. Začiatkom októbra viedla ťažké útoky pri Čremošnom a Malom Šturci s cieľom preraziť k Banskej Bystrici.",
+      "Podľa hlásenia veliteľa jej pluku z 4. októbra 1944 narazila pri Hornej Štubni na „zvlášť tvrdošijný odpor“."
+    ]
+  }
+];
+
+/* --- vládne vedenie Slovenského štátu v Bratislave --- */
+const GOVERNMENT = [
+  {
+    id:"tiso", type:"govt",
+    name:"Jozef Tiso",
+    role:"Prezident Slovenského štátu",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(48.1486,17.1077), hq:"Bratislava",
+    photo:{file:"Jozef Tiso.jpg", credit:"Bundesarchiv, Bild 146-2010-0049 · CC BY-SA 3.0 DE · cez Wikimedia Commons"},
+    bio:[
+      "Prezident vojnového Slovenského štátu a spojenec nacistického Nemecka. Vypuknutie SNP bolo nepriamo namierené aj proti jeho autoritatívnemu režimu.",
+      "29. augusta 1944 dal na svoj príkaz odvysielať prejav ministra obrany Čatloša o vstupe nemeckých vojsk. Deň nato, 30. augusta, sám v rozhlase vyhlásil, že jediným cieľom nemeckých jednotiek je „likvidácia partizánskej zberby“, a nariadil generálovi Malárovi vyzvať armádu, aby sa nezapájala do odporu.",
+      "Po páde Banskej Bystrice a definitívnom potlačení organizovaného odporu koncom októbra 1944 vystúpil na banskobystrickom námestí s ďakovným prejavom a vyznamenal nemeckých vojakov, ktorí povstanie potlačili.",
+      "Povojnový osud: v apríli 1945 utiekol do Rakúska a neskôr do Bavorska, kde ho v júni 1945 zaistili americkí vojaci a vydali československým úradom. Mimoriadny Národný súd v Bratislave ho 15. apríla 1947 odsúdil na trest smrti za velezradu a kolaboráciu; obesený bol 18. apríla 1947 na dvore Justičného paláca v Bratislave. Žiadosť o milosť vláda zamietla."
+    ]
+  },
+  {
+    id:"catlos", type:"govt",
+    name:"Ferdinand Čatloš",
+    role:"Minister národnej obrany Slovenského štátu",
+    from:"1944-08-29", to:"1944-09-02",
+    loc:P(48.1486,17.1077), hq:"Bratislava",
+    bio:[
+      "Minister národnej obrany, ktorý 29. augusta 1944 večer v rozhlasovom prejave oznámil, že slovenská vláda pozvala nemeckú armádu na Slovensko „na pomoc proti partizánom“ — týmto prejavom sa oficiálne zdôvodnil vstup Wehrmachtu.",
+      "Krátko predtým stratil dôveru Berlína a bol prakticky odstavený od reálneho velenia. Existujú indície, že tajne pripravoval vlastný plán na vystúpenie Slovenska z vojny po boku spojencov (tzv. Čatlošovo memorandum), pripravovaný spolu s generálom Malárom.",
+      "2. septembra 1944 sa mu podarilo utiecť z Prezidentského paláca do Banskej Bystrice, kde sa dal k dispozícii povstalcom — tí však jeho služby odmietli. 13. septembra 1944 bol zadržaný a odvezený do ZSSR. Povojnový osud: bol súdený a odsúdený, no napokon prepustený; dožil v ústraní v Martine, kde zomrel 31. augusta 1972."
+    ]
+  }
+];
+
+/* --- Východoslovenská armáda (Prešov) --- */
+const VSA = [
+  {
+    id:"vsa", type:"vsa",
+    name:"Východoslovenská armáda",
+    commander:"gen. II. tr. Augustín Malár",
+    from:"1944-08-29", to:"1944-08-31",
+    loc:P(48.9984,21.2411), hq:"Prešov (veliteľstvo), Giraltovce a okolie",
+    bio:[
+      "Zbor dvoch najkvalitnejších slovenských divízií (1. a 2. pešia divízia, spolu vyše 30-tisíc mužov), rozmiestnený v priestore Prešov – Bardejov – Humenné. Povstalecké plánovanie počítalo s tým, že práve táto armáda otvorí karpatské priesmyky postupujúcej Červenej armáde.",
+      "Tento zámer zmarili Nemci: na prelome augusta a septembra 1944 spustili akciu s krycím názvom „Kartoffeln mit Prämie“ a väčšinu jednotiek Východoslovenskej armády 31. augusta odzbrojili bez väčšieho boja. Veliteľ gen. Augustín Malár bol v ten deň zajatý na letisku pri Nižnej Šebastovej.",
+      "Strata tejto armády pripravila povstanie o jeho najsilnejšiu vojenskú zložku a priamo si vyžiadala sovietsku Karpatsko-duklianskú operáciu (od 8. septembra 1944), ktorá sa mala k povstalcom prebiť cez Dukliansky priesmyk — no dorazila neskoro a s ťažkými stratami.",
+      "Povojnový osud veliteľa: Malár bol po zatknutí prevezený do Berlína, zbavený hodností aj Rytierskeho kríža. Podľa dostupných svedectiev bol v druhej polovici marca 1945 popravený v koncentračnom tábore Flossenbürg spolu s Golianom, Viestom a generálom Jurechom — Malárov presný osud však dodnes historici považujú za nie úplne objasnený."
+    ]
+  }
+];
+
+/* --- klikateľné kľúčové mestá (samostatná vizuálna kategória) --- */
+const KEY_TOWNS = [
+  {
+    id:"t-bb", type:"town",
+    name:"Banská Bystrica",
+    role:"Srdce povstania",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(48.7395,19.1535),
+    bio:[
+      "Sídlo Slovenskej národnej rady, veliteľstva 1. čs. armády na Slovensku aj Hlavného štábu partizánskych oddielov — politické aj vojenské centrum celého povstania.",
+      "27. – 28. októbra 1944 mesto obsadili nemecké jednotky, čím sa organizovaný odpor SNP zrútil a boj pokračoval už len ako partizánska vojna v horách."
+    ]
+  },
+  {
+    id:"t-zvolen", type:"town",
+    name:"Zvolen",
+    role:"Kľúčový železničný uzol · sídlo III. taktickej skupiny Gerlach",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(48.5763,19.1338),
+    bio:["Dôležitá železničná križovatka na juhu povstaleckého územia a základňa najsilnejšej z taktických skupín, ktorá bránila prístupy od Krupiny a stredného Pohronia."]
+  },
+  {
+    id:"t-martin", type:"town",
+    name:"Martin",
+    role:"Kolíska slovenského národného hnutia",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(49.0653,18.9219),
+    bio:[
+      "Mesto späté s Maticou slovenskou a slovenským národným obrodením 19. storočia. Počas SNP ležalo na severnom krídle frontu a stalo sa jedným z cieľov postupu nemeckej armádnej skupiny Schäfer a divízie Tatra."
+    ]
+  },
+  {
+    id:"t-ruzomberok", type:"town",
+    name:"Ružomberok",
+    role:"Iskra, ktorá urýchlila zásah Nemcov",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(49.0775,19.3096),
+    bio:[
+      "27. augusta 1944 — ešte pred oficiálnym vypuknutím povstania — mesto s dôležitou železničnou traťou a vojenskou výrobou obsadili partizáni. Tento krok zvýšil znepokojenie v Berlíne a urýchlil rozhodnutie o vstupe nemeckých vojsk na Slovensko."
+    ]
+  },
+  {
+    id:"t-brezno", type:"town",
+    name:"Brezno",
+    role:"Sídlo II. taktickej skupiny Fatra",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(48.8058,19.6408),
+    bio:["Kľúčový uzol Horehronia, odkiaľ sa riadila obrana priesmykov Čertovica a okolia Telgártu na východnom krídle frontu."]
+  },
+  {
+    id:"t-prievidza", type:"town",
+    name:"Prievidza",
+    role:"Front proti bojovej skupine Schill",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(48.7712,18.6229),
+    bio:["Banícke mesto na západnom krídle povstaleckého územia. V polovici septembra 1944 ho obsadila nemecká bojová skupina Schill, čo vážne oslabilo obranu tejto časti frontu."]
+  },
+  {
+    id:"t-handlova", type:"town",
+    name:"Handlová",
+    role:"Banícke mesto na západnom fronte",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(48.7266,18.7539),
+    bio:["Ďalšie z uhoľných baníckych miest zapojených do obrany západného krídla proti postupujúcej skupine Schill."]
+  },
+  {
+    id:"t-kremnica", type:"town",
+    name:"Kremnica",
+    role:"Historické banské a mincovné mesto",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(48.7115,18.9236),
+    bio:["Stredoveké banské mesto (zlato, striebro, mincovňa) v tesnej blízkosti Banskej Bystrice — ležalo na trase nemeckého postupu na hlavné mesto povstania."]
+  },
+  {
+    id:"t-nemecka", type:"town",
+    name:"Nemecká",
+    role:"Miesto jednej z najväčších tragédií SNP",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(48.7333,19.4667),
+    bio:[
+      "Obec pri Banskej Bystrici, kde sa po potlačení povstania koncom roka 1944 stal areál vápenky miestom masových vrážd stoviek zajatých partizánov, vojakov aj civilistov nemeckými jednotkami a kolaborantmi.",
+      "Patrí medzi najtemnejšie kapitoly celého povstania a pripomína si ju dodnes ako symbol represálií, ktoré nasledovali po páde organizovaného odporu."
+    ]
+  },
+  {
+    id:"t-bratislava", type:"town",
+    name:"Bratislava",
+    role:"Hlavné mesto Slovenského štátu",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(48.1486,17.1077),
+    bio:[
+      "Sídlo prezidenta Jozefa Tisa a vlády Slovenského štátu, spojenca nacistického Nemecka. Odtiaľto zaznel 29. augusta 1944 rozhlasový prejav ministra obrany Čatloša, ktorým sa zdôvodnil vstup nemeckých vojsk na Slovensko.",
+      "Mesto zostalo mimo povstaleckého územia počas celého trvania SNP — oslobodené bolo až Červenou armádou 4. apríla 1945."
+    ]
+  },
+  {
+    id:"t-presov", type:"town",
+    name:"Prešov",
+    role:"Sídlo Východoslovenskej armády",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(48.9984,21.2411),
+    bio:["Veliteľstvo Východoslovenskej armády, ktorej odzbrojenie Nemcami koncom augusta 1944 pripravilo povstanie o jeho najsilnejšiu vojenskú zložku a priamo predurčilo neskorší priebeh Karpatsko-duklianskej operácie."]
+  },
+  {
+    id:"t-kosice", type:"town",
+    name:"Košice",
+    role:"Mimo územia SNP — pod maďarskou správou",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(48.7164,21.2611),
+    bio:[
+      "Po Viedenskej arbitráži z roku 1938 patrili Košice a časť južného a východného Slovenska Maďarsku, a tak ležali úplne mimo povstaleckého územia aj mimo dosahu 1. čs. armády na Slovensku.",
+      "Mesto oslobodila Červená armáda a 1. čs. armádny zbor 19. januára 1945; krátko nato sa stalo dočasným sídlom obnovenej československej vlády."
+    ]
+  },
+  {
+    id:"t-poprad", type:"town",
+    name:"Poprad",
+    role:"Partizánske pôsobenie po páde frontu",
+    from:"1944-08-29", to:"1944-10-30",
+    loc:P(49.0552,20.2979),
+    bio:["Po rozpade organizovaného frontu koncom októbra 1944 sa v okolí Popradu a Vysokých Tatier presunulo viacero partizánskych veliteľov a jednotiek. Mesto bolo oslobodené 28. januára 1945."]
+  },
+];
+
+/* --- letiská a vzdušný most --- */
+const AIRFIELDS = [
+  {
+    id:"tri-duby", type:"airfield",
+    name:"Letisko Tri Duby (Sliač)",
+    role:"Kľúčové povstalecké letisko a vzdušný most so spojencami",
+    from:"1944-08-29", to:"1944-10-26",
+    loc:P(48.6378,19.1342), hq:"Sliač",
+    bio:[
+      "Najdôležitejšie povstalecké letisko SNP. Od vypuknutia povstania tadiaľto prúdila prevažná časť leteckej pomoci — pristávali tu slovenské, sovietske aj západné spojenecké lietadlá a udržiaval sa cezeň spoj s okolitým svetom.",
+      "V noci z 5. na 6. októbra 1944 tu pristálo a odletelo až 162 lietadiel. Medzi 25. septembrom a 16. októbrom sem sovietske stroje previezli 2. československú paradesantnú brigádu — vyše 1 700 osôb a 248 ton výzbroje. 17. septembra a 7. októbra sem prileteli aj americké B-17 s materiálnou pomocou a misiou OSS.",
+      "Slúžilo aj na evakuáciu ranených a zostrelených spojeneckých letcov do zahraničia. 26. októbra 1944 ho tesne pred pádom Banskej Bystrice obsadila nemecká bojová skupina Schill."
+    ]
+  },
+  {
+    id:"zolna", type:"airfield",
+    name:"Poľné letisko Zolná",
+    role:"Základňa 1. čs. stíhacieho leteckého pluku",
+    from:"1944-09-17", to:"1944-10-12",
+    loc:P(48.6206,19.2419), hq:"Zolná pri Zvolene",
+    bio:[
+      "Provizórne poľné letisko, na ktorom pôsobil 1. československý stíhací letecký pluk pod velením npor. Františka Fajtla po presune zo ZSSR.",
+      "Pre rozmočenú trávnatú plochu po vydatných dažďoch sa 12. októbra 1944 peruť presunula na spevnenú plochu na Troch Duboch, kde mohla bezpečne fungovať za každého počasia."
+    ]
+  }
+];
+
+/* --- vypálené obce (represálie po potlačení SNP) --- */
+const BURNED_VILLAGES = [
+  {
+    id:"klak", type:"burned",
+    name:"Kľak",
+    role:"Vypálená a vyvraždená obec — „Krvavá nedeľa“",
+    from:"1944-08-29", to:"1945-01-21",
+    loc:P(48.5975,18.6683), hq:"okres Žarnovica",
+    bio:[
+      "21. januára 1945 — v deň, ktorý vošiel do dejín ako Krvavá nedeľa — vtrhla do obce protipartizánska jednotka Edelweiss pod velením Ladislava Nižňanského spolu s Pohotovostnými oddielmi Hlinkovej gardy a jednotkou Heimatschutzu.",
+      "V Kľaku postrieľali desiatky obyvateľov a obec vypálili — zhorelo spolu 132 domov vrátane fary. Spolu so susedným Ostrým Grúňom si tento deň vyžiadal 148 obetí; trest mal zastrašiť miestnych, ktorí podporovali partizánske brigády operujúce v okolitých horách Kľakovskej doliny."
+    ]
+  },
+  {
+    id:"ostry-grun", type:"burned",
+    name:"Ostrý Grúň",
+    role:"Vypálená a vyvraždená obec — „Krvavá nedeľa“",
+    from:"1944-08-29", to:"1945-01-21",
+    loc:P(48.5878,18.6494), hq:"okres Žarnovica",
+    bio:[
+      "Susedná obec Kľaku, postihnutá tým istým masakrom 21. januára 1945. Miestni obyvatelia predtým aktívne pomáhali partizánskym oddielom Jan Žižka a Vorošilov, ktoré prepadávali nemecké jednotky v pohorí Vtáčnik.",
+      "Práve táto podpora partizánom sa stala zámienkou pre krutú odvetu jednotky Edelweiss a Hlinkovej gardy — obec bola vyvraždená a vypálená."
+    ]
+  },
+  {
+    id:"kaliste", type:"burned",
+    name:"Kalište",
+    role:"Jediná slovenská obec, ktorá po vypálení nebola nikdy obnovená",
+    from:"1944-08-29", to:"1945-03-06",
+    loc:P(48.7206,19.2358), hq:"okres Banská Bystrica",
+    bio:[
+      "Skorým ránom začiatkom marca 1945 obkľúčilo horskú osadu asi 300 nemeckých vojakov. Deviatich obyvateľov upálili zaživa v horiacich domoch, ďalších zastrelili priamo na mieste; skupinu zajatých mužov neskôr postrieľali v neďalekej Moštenici.",
+      "Z 42 domov ostalo stáť len šesť. Na rozdiel od ostatných vypálených obcí sa život do Kališťa po vojne už nevrátil — obyvateľom postavili náhradné byty na sídlisku Fončorda v Banskej Bystrici, symbolicky nazvanom Nové Kalište."
+    ]
+  },
+  {
+    id:"tokajik", type:"burned",
+    name:"Tokajík",
+    role:"Vypálená obec na východnom Slovensku",
+    from:"1944-08-29", to:"1944-11-19",
+    loc:P(49.2119,21.7803), hq:"okres Stropkov",
+    bio:[
+      "19. – 20. novembra 1944 obkľúčilo obec asi 200 nemeckých vojakov. Za obcou zastrelili 32 miestnych mužov a takmer všetky domy následne vypálili — ušiel iba gréckokatolícky kostol a jeden dom na okraji obce."
+    ]
+  }
+];
+
+/* --- miesta masových popráv a represálií --- */
+const EXECUTION_SITES = [
+  {
+    id:"kremnicka", type:"exec",
+    name:"Kremnička",
+    role:"Najväčší doložený vojnový zločin na Slovensku",
+    from:"1944-08-29", to:"1945-03-17",
+    loc:P(48.7228,19.1425), hq:"dnes mestská časť Banskej Bystrice",
+    bio:[
+      "Od 5. novembra 1944 do 17. marca 1945 tu jednotka Einsatzkommando 14 spolu s Pohotovostnými oddielmi Hlinkovej gardy vykonala sériu masových popráv väzňov z Krajského súdu v Banskej Bystrici — partizánov, povstaleckých vojakov, civilistov obvinených z podpory SNP aj rasovo prenasledovaných.",
+      "Obete strieľali do tyla na okraji protitankových zákopov južne od obce. Po vojne tu exhumovali 747 obetí vrátane 211 žien a 58 detí; časť hrobov dodnes nebola odkrytá. Spolu s neďalekou Nemeckou ide o najväčší doložený vojnový zločin spáchaný na území Slovenska."
+    ]
+  }
+];
+
+/* --- ďalšie významné osobnosti SNP (politické, hospodárske, sporné) --- */
+const PERSONALITIES = [
+  {
+    id:"karvas", type:"person",
+    name:"Imrich Karvaš",
+    role:"Guvernér Slovenskej národnej banky · „financmajster povstania“",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.7395,19.1535), hq:"Bratislava / Banská Bystrica",
+    bio:[
+      "Prvý guvernér Slovenskej národnej banky, ekonóm a právnik, ktorý navonok viedol menovú politiku Slovenského štátu, no tajne viedol voči nemeckým záujmom dvojtvárnu politiku a zapájal sa do príprav odboja.",
+      "Pred vypuknutím povstania presunul do Banskej Bystrice a ďalších pobočiek na stredné Slovensko obrovské množstvo hotovosti — vyše 3 miliárd korún — a zásoby, o ktorých vedel, že sa stanú povstaleckým územím. Prakticky tak financoval SNP.",
+      "Za svoju úlohu bol nacistami odsúdený na trest smrti. Po vojne bol napriek tomu perzekvovaný aj komunistickým režimom pre svoj odmietavý postoj k nemu a bol dlhoročne väznený."
+    ]
+  },
+  {
+    id:"zatko", type:"person",
+    name:"Peter Zaťko",
+    role:"Národohospodár · člen Rady na obranu Slovenska",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.7395,19.1535), hq:"Banská Bystrica",
+    bio:[
+      "Popredný slovenský národohospodár, ktorý spolu s Imrichom Karvašom viedol voči Nemecku dvojtvárnu hospodársku politiku už pred povstaním a pomáhal zabezpečiť materiálne zázemie odboja.",
+      "Počas SNP zasadal v Rade na obranu Slovenska — najvyššom koordinačnom orgáne povstania — ako zástupca demokratického bloku. Po vojne bol jedným zo signatárov Vianočnej dohody, ktorých komunistický režim neskôr perzekvoval."
+    ]
+  },
+  {
+    id:"srobar", type:"person",
+    name:"Vavro Šrobár",
+    role:"Predseda Slovenskej národnej rady (spolu so Šmidkem)",
+    from:"1944-08-30", to:"1944-10-24",
+    loc:P(48.7395,19.1535), hq:"Banská Bystrica",
+    bio:[
+      "Starší štátnik a jedna z kľúčových postáv slovenskej politiky ešte spred vzniku Československa, ktorý sa do povstania zapojil hneď v noci z 29. na 30. augusta 1944.",
+      "Stal sa jedným z dvoch predsedov Slovenskej národnej rady (spolu s komunistom Karolom Šmidkem) a keďže Šmidke zastával aj ďalšie funkcie, väčšinu zasadnutí SNR až do polovice októbra viedol práve Šrobár.",
+      "23. – 24. októbra 1944 odletel spolu s československou vládnou delegáciou z letiska Tri Duby na oslobodené územie a ďalej do Moskvy rokovať o povojnovom usporiadaní."
+    ]
+  },
+  {
+    id:"ursiny", type:"person",
+    name:"Ján Ursíny",
+    role:"Predstaviteľ občianskeho (demokratického) bloku v SNR",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.7395,19.1535), hq:"Banská Bystrica",
+    bio:[
+      "Bývalý agrárny politik a jeden zo signatárov Vianočnej dohody z decembra 1943 za občiansky blok odboja. Po vypuknutí SNP patril k členom predsedníctva Slovenskej národnej rady.",
+      "Spolu s Jozefom Lettrichom a Matejom Joskom reprezentoval v SNR demokratickú (nekomunistickú) líniu odboja, ktorá vyvažovala vplyv komunistických zástupcov Husáka, Novomeského a Šmidkeho."
+    ]
+  },
+  {
+    id:"lettrich", type:"person",
+    name:"Jozef Lettrich",
+    role:"Predstaviteľ občianskeho bloku v SNR",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.7395,19.1535), hq:"Banská Bystrica",
+    bio:[
+      "Právnik a demokratický politik, jeden zo signatárov Vianočnej dohody. Počas povstania patril k vedúcim predstaviteľom občianskeho bloku v Slovenskej národnej rade.",
+      "Po vojne sa stal predsedom SNR, no po komunistickom prevrate vo februári 1948 bol nútený emigrovať."
+    ]
+  },
+  {
+    id:"husak", type:"person",
+    name:"Gustáv Husák",
+    role:"Vedúca postava komunistického bloku v SNR",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.7395,19.1535), hq:"Banská Bystrica",
+    bio:[
+      "Popredný predstaviteľ ilegálnej Komunistickej strany Slovenska, jeden zo signatárov Vianočnej dohody a spoluautor jej konceptu. Počas SNP patril k najvýraznejším postavám komunistického krídla Slovenskej národnej rady.",
+      "Po potlačení organizovaného odporu pôsobil naďalej v odboji a neskôr aj v politickom oddelení sovietskeho frontu. Po vojne prešiel búrlivou politickou kariérou — v 50. rokoch bol sám väznený vlastným režimom, po roku 1968 sa stal najvyššie postaveným predstaviteľom komunistického Československa."
+    ]
+  },
+  {
+    id:"novomesky", type:"person",
+    name:"Laco Novomeský",
+    role:"Básnik a kultúrny politik komunistického bloku v SNR",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.7395,19.1535), hq:"Banská Bystrica",
+    bio:[
+      "Jeden z najvýznamnejších slovenských medzivojnových básnikov (skupina DAV) a súčasne popredný komunistický funkcionár. Patril medzi signatárov Vianočnej dohody a zakladateľov ilegálnej Slovenskej národnej rady.",
+      "Po vojne pôsobil aj ako predseda Matice slovenskej, v 50. rokoch bol podobne ako Husák perzekvovaný vlastným režimom v politických procesoch, neskôr rehabilitovaný."
+    ]
+  },
+  {
+    id:"velicko", type:"person",
+    name:"Piotr Alexejevič Veličko",
+    role:"Sovietsky dôstojník, kontroverzný veliteľ partizánov",
+    from:"1944-08-29", to:"1944-10-28",
+    loc:P(48.7395,19.1535), hq:"stredné Slovensko",
+    bio:[
+      "Sovietsky dôstojník pôsobiaci pri organizovaní partizánskeho hnutia na Slovensku. Na rozdiel od disciplinovanejších veliteľov ako Asmoľov je jeho pôsobenie spájané s tvrdými a mnohokrát svojvoľnými metódami, vrátane násilných mobilizácií a represálií voči civilnému obyvateľstvu nemeckej menšiny.",
+      "Sám Ján Golian ho žiadal, aby zastavil provokačné akcie, keďže mohli vyvolať nemecké represálie skôr, než k nim bol front pripravený. Veličkovo pôsobenie zostáva jednou z kontroverznejších kapitol partizánskej vojny na Slovensku."
+    ]
+  }
+];
+
+const ALL_MARKERS = [...COMMANDERS, ...TACTICAL_GROUPS, ...PARTISANS, ...GERMAN_GROUPS, ...GOVERNMENT, ...VSA, ...KEY_TOWNS, ...AIRFIELDS, ...BURNED_VILLAGES, ...EXECUTION_SITES, ...PERSONALITIES];
+
+/* --- udalosti (denník) --- */
+const EVENTS = [
+  ["1944-08-25","Golian vydáva tajnú inštrukciu posádkam o ozbrojenom odpore, ak nemecké vojská prekročia hranice štátu."],
+  ["1944-08-27","Partizáni obsadzujú Ružomberok — strategickú železničnú križovatku s dôležitou vojenskou výrobou."],
+  ["1944-08-29","Okolo 10. hodiny začínajú nemecké vojská obsadzovať Slovensko. Minister obrany Čatloš to oznamuje v rozhlase."],
+  ["1944-08-29","Krátko po 20. hodine vydáva pplk. Golian heslo „Začnite s vysťahovaním!“ — signál na začiatok ozbrojeného odporu."],
+  ["1944-08-30","Prezident Tiso v rozhlase vyhlasuje, že cieľom nemeckých vojsk je len „likvidácia partizánskej zberby“, a nariaďuje generálovi Malárovi vyzvať armádu, aby sa nezúčastnila odporu. SNP je súčasne oficiálne vyhlásené a nariadená je mobilizácia mužov do 35 rokov."],
+  ["1944-08-31","Nemci spúšťajú akciu „Kartoffeln mit Prämie“ a odzbrojujú väčšinu Východoslovenskej armády pri Prešove bez väčšieho boja. Veliteľ gen. Malár je zajatý na letisku pri Nižnej Šebastovej."],
+  ["1944-09-01","Slovenská národná rada preberá moc na povstaleckom území a deklaruje obnovenie Československa."],
+  ["1944-09-02","Sovietske velenie schvaľuje Karpatsko-duklianskú operáciu, ktorá má cez karpatské priesmyky priniesť pomoc povstaniu."],
+  ["1944-09-04","Po demisii časti ministrov menuje prezident Tiso v Bratislave nový kabinet na čele so Štefanom Tisom. Minister Čatloš z Bratislavy uniká smerom k odbojovému územiu."],
+  ["1944-09-07","Karol Šmidke je menovaný náčelníkom Hlavného štábu partizánskych oddielov."],
+  ["1944-09-08","Začína Karpatsko-duklianska operácia 1. československého armádneho zboru a Červenej armády — pokus prebiť sa cez Dukliansky priesmyk na pomoc SNP."],
+  ["1944-09-20","Sovietske a československé jednotky po ťažkých bojoch dobýjajú mesto Dukla v Poľsku a postupujú k rovnomennému priesmyku."],
+  ["1944-09-10","Povstalecká armáda je reorganizovaná na šesť taktických skupín: Kriváň, Fatra, Gerlach, Muráň, Ďumbier a Zobor."],
+  ["1944-09-11","Bojová skupina Schill prelamuje obranu IV. taktickej skupiny pri Zemianskych Kostoľanoch."],
+  ["1944-09-14","Plukovník Mikuláš Markus preberá velenie IV. taktickej skupiny „Muráň“."],
+  ["1944-09-18","Vzniká Hlavný štáb partizánskych oddielov ako ústredný koordinačný orgán partizánskeho hnutia."],
+  ["1944-09-22","Nemecká skupina Schill postupne ovláda okolie Prievidze, západné krídlo frontu je pod silným tlakom."],
+  ["1944-09-30","Alexej Asmoľov sa stáva veliteľom Hlavného štábu partizánskeho hnutia v Československu."],
+  ["1944-10-04","Ťažké boje pri Čremošnom a Malom Šturci — obrnený vlak Hurban spôsobuje divízii Tatra vážne straty."],
+  ["1944-10-06","Sovietske a československé jednotky po takmer mesiaci bojov dobýjajú samotný Dukliansky priesmyk — ich ďalší postup k Prešovu sa však o niekoľko dní zastavuje pred Svidníkom. Partizánska brigáda Klement Gottwald prijíma do svojich radov dôstojníkov prechádzajúcich na partizánsky boj."],
+  ["1944-10-07","Armádny generál Rudolf Viest preberá najvyššie velenie nad 1. čs. armádou na Slovensku, Golian sa stáva jeho náčelníkom štábu."],
+  ["1944-10-15","Nemecké komando pod velením Otta Skorzenyho unesie syna maďarského regenta a obsadí Budapešť — pripravovaná kapitulácia Maďarska voči Spojencom stroskotáva. Regent Miklós Horthy je internovaný a moc preberá fašistická vláda Ferenca Szálasiho. Maďarsko tak zostáva násilne v tábore Osi, čím padá posledná nádej povstalcov na uvoľnenie frontu od juhu."],
+  ["1944-10-18","Zloženie 1. čs. armády na Slovensku k tomuto dňu: veliteľstvo v Banskej Bystrici a šesť taktických skupín na frontových úsekoch. V ten istý deň spúšťajú nemecké jednotky generálnu ofenzívu proti povstaleckému územiu na všetkých úsekoch frontu."],
+  ["1944-10-23","Plukovník Štefan Kuna a plukovník Markus končia vo velení svojich taktických skupín pred záverečnou fázou bojov."],
+  ["1944-10-27","Nemecké jednotky obsadzujú Banskú Bystricu — centrum povstania padá po takmer dvoch mesiacoch organizovaného odporu."],
+  ["1944-10-28","Viest a Golian nariaďujú prechod na partizánsky spôsob boja. Zvyšné jednotky ustupujú do hôr Nízkych Tatier."],
+  ["1944-10-30","Nemecké velenie vyhlasuje organizovaný odpor SNP za definitívne potlačený. Prezident Tiso krátko nato slúži v Banskej Bystrici ďakovnú omšu a vyznamenáva nemeckých vojakov, ktorí povstanie potlačili."],
+];
+
+/* --- fázy frontu (zjednodušené polygóny drženého územia) --- */
+const PHASES = [
+  {
+    from:"1944-08-29", to:"1944-09-09",
+    label:"Počiatočné povstalecké územie",
+    pts:[[434,145],[439,211],[606,217],[575,237],[581,347],[822,326],[787,409],[713,410],[705,453],[667,483],[330,572],[362,462],[271,395],[196,387],[140,364],[270,217]]
+  },
+  {
+    from:"1944-09-10", to:"1944-09-30",
+    label:"Územie po reorganizácii na 6 taktických skupín (10. sept.)",
+    pts:[[270,217],[439,211],[606,217],[575,237],[581,347],[822,326],[787,409],[713,410],[705,453],[667,483],[330,572],[362,462],[271,395],[222,378]]
+  },
+  {
+    from:"1944-10-01", to:"1944-10-15",
+    label:"Zmenšujúce sa územie — tlak od západu a severu",
+    pts:[[300,260],[439,211],[606,217],[575,237],[581,347],[822,326],[787,409],[713,410],[705,453],[667,483],[330,572],[362,462],[300,410]]
+  },
+  {
+    from:"1944-10-16", to:"1944-10-26",
+    label:"Posledná obranná línia okolo Banskej Bystrice",
+    pts:[[360,300],[500,300],[581,347],[600,410],[500,460],[400,462],[330,450],[340,360]]
+  },
+  {
+    from:"1944-10-27", to:"1944-10-27",
+    label:"Pád Banskej Bystrice — front sa rozpadá",
+    pts:[[400,340],[460,340],[470,390],[420,400],[390,375]]
+  },
+  {
+    from:"1944-10-28", to:"1944-10-30",
+    label:"Organizovaný front zanikol — boj pokračuje v horách ako partizánska vojna",
+    pts:[]
+  },
+];
+
+// PHASES boli pôvodne autorované v súradniciach pomocnej mapy len pre
+// stredné Slovensko. Prepočítame ich na skutočné zemepisné súradnice
+// (lat, lon), aby sa dali vykresliť ako polygón priamo na OpenStreetMape.
+PHASES.forEach(ph=>{
+  ph.pts = ph.pts.map(([x,y])=> invOldProj(x,y)); // => [lat,lon]
+});
+
+function phaseForDate(d){
+  for(const ph of PHASES){
+    if(d>=D(ph.from) && d<=D(ph.to)) return ph;
+  }
+  return PHASES[PHASES.length-1];
+}
+
+/* ============================================================
+   RENDER: mapa, mestá, značky
+   ============================================================ */
+
+/* ============================================================
+   RENDER: skutočná mapa cez Leaflet + OpenStreetMap
+   ============================================================ */
+
+const map = L.map('leafletMap', {
+  zoomControl: true,
+  attributionControl: true,
+  minZoom: 6,
+  maxZoom: 14,
+});
+map.setView([48.75, 19.6], 7);
+
+// Primárny zdroj: CARTO "Dark Matter" — mapové dlaždice postavené na dátach
+// OpenStreetMap, len s tmavým štýlom (ladí s vizuálom stránky) a v praxi
+// spoľahlivejšie fungujú vo vložených/sandboxovaných prostrediach ako
+// priame dlaždice z tile.openstreetmap.org (tie bežne blokujú neznáme originy).
+const primaryTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  subdomains: 'abcd',
+  maxZoom: 18,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> prispievatelia &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'
+}).addTo(map);
+
+// Ak by aj toto zlyhalo, skúsime záložne priamo štandardné OSM dlaždice.
+let fallbackTried = false;
+primaryTiles.on('tileerror', ()=>{
+  if(fallbackTried) return;
+  fallbackTried = true;
+  map.removeLayer(primaryTiles);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> prispievatelia'
+  }).addTo(map);
+});
+
+/* --- kontextové mestá (malé, neklikateľné body) --- */
+const townsLayerGroup = L.layerGroup().addTo(map);
+TOWNS.forEach(([name, lat, lon])=>{
+  L.circleMarker([lat,lon], {
+    radius:2.6, color:"rgba(233,225,201,.55)", weight:1,
+    fillColor:"rgba(233,225,201,.55)", fillOpacity:.9, interactive:false
+  }).addTo(townsLayerGroup);
+  L.marker([lat,lon], {
+    icon: L.divIcon({
+      className:'town-label-icon',
+      html:`<span class="town-ctx-label">${name}</span>`,
+      iconSize:[140,14], iconAnchor:[-6,7]
+    }),
+    interactive:false
+  }).addTo(townsLayerGroup);
+});
+
+/* --- historické štáty okolo Slovenska (1944) --- */
+const historicalLayerGroup = L.layerGroup().addTo(map);
+HISTORICAL_LABELS.forEach(h=>{
+  L.marker([h.lat, h.lon], {
+    icon: L.divIcon({
+      className:'hist-label-icon',
+      html:`
+        <div class="hist-label${h.home ? ' home' : ''}">
+          <div class="h-title">${h.title}</div>
+          ${h.sub ? `<div class="h-sub">${h.sub}</div>` : ''}
+        </div>`,
+      iconSize:[230, h.sub ? 40 : 22],
+      iconAnchor:[115, h.sub ? 20 : 11],
+    }),
+    interactive:false
+  }).addTo(historicalLayerGroup);
+});
+
+document.getElementById("histToggle").addEventListener("change",(e)=>{
+  if(e.target.checked) historicalLayerGroup.addTo(map);
+  else map.removeLayer(historicalLayerGroup);
+});
+
+document.getElementById("easternFrontToggle").addEventListener("change",(e)=>{
+  showEasternFront = e.target.checked;
+  updateEasternFront(dateAt(+slider.value));
+});
+
+document.getElementById("germanOccToggle").addEventListener("change",(e)=>{
+  showGermanOccupation = e.target.checked;
+  updateGermanOccupation(dateAt(+slider.value));
+});
+
+
+const COLORS = {cmd:"#dab766", ts:"#e9e1c9", pz:"#63938e", de:"#a9a9a9", govt:"#c1504a", vsa:"#7fa0bd", town:"#cbb97a", airfield:"#7ec8e3", burned:"#c1602f", exec:"#7a2a2a", person:"#a690c4"};
+const SIZES  = {cmd:16, ts:15, pz:15, de:13, govt:16, vsa:16, town:11, airfield:15, burned:11, exec:12, person:13};
+
+function shapeClassFor(type){
+  if(type==="ts") return "lm-diamond";
+  if(type==="town" || type==="burned" || type==="exec") return "lm-square";
+  return "lm-circle";
+}
+function labelFor(m){
+  if(m.type==="cmd" || m.type==="govt") return m.name.split(" ").pop();
+  if(m.type==="ts") return "TS "+m.number;
+  if(m.type==="vsa") return "VSA";
+  if(m.type==="town" || m.type==="airfield" || m.type==="burned" || m.type==="exec") return m.name;
+  return m.name.split(" ").slice(-1)[0];
+}
+
+/* --- vlastné (autorsky voľné) vojenské emblémy pre jednotky ---
+   Slovenský dvojkríž na trojvrší: velenie, taktické skupiny, VSA
+   Päťcípa hviezda: partizánske oddiely
+   Nemecký železný kríž (croix pattée): nemecké jednotky
+   Ide o jednoduché, samostatne nakreslené heraldické tvary — nie o loga
+   ani chránené symboly (výslovne bez hákového kríža). */
+function unitEmblemSVG(type, sizePx){
+  const s = Math.max(10, Math.round(sizePx * 0.62));
+  const iconColors = { cmd:"#241b09", ts:"var(--parchment)", vsa:"#0e1e2b", de:"#232323", pz:"#f4efe2" };
+  const col = iconColors[type];
+  if(!col) return "";
+
+  let inner = "";
+  if(type==="cmd" || type==="ts" || type==="vsa"){
+    // dvojkríž na trojvrší (zjednodušený slovenský štátny emblém)
+    inner = `
+      <path d="M4,21 Q4,14.6 8.1,14.6 Q8.1,10.1 12,10.1 Q15.9,10.1 15.9,14.6 Q20,14.6 20,21 Z" fill="${col}"/>
+      <rect x="10.6" y="2" width="1.8" height="15.2" fill="${col}"/>
+      <rect x="6.8" y="5.1" width="9.4" height="1.8" fill="${col}"/>
+      <rect x="7.8" y="9.5" width="7.4" height="1.8" fill="${col}"/>`;
+  } else if(type==="de"){
+    // nemecký železný kríž (croix pattée) — vojnové vyznamenanie, nie stranícky symbol
+    inner = `<path d="M9,2 L15,2 L14,7.3 L18.3,6.2 L22,10.2 L17,11.4 L18.3,15.8 L14,14.6 L15,20 L9,20 L10,14.6 L5.7,15.8 L7,11.4 L2,10.2 L5.7,6.2 L10,7.3 Z" fill="${col}"/>`;
+  } else if(type==="pz"){
+    // päťcípa hviezda — partizánske oddiely
+    inner = `<path d="M12,2.4 L14.6,9.1 L21.7,9.4 L16.1,13.9 L18,20.9 L12,16.9 L6,20.9 L7.9,13.9 L2.3,9.4 L9.4,9.1 Z" fill="${col}"/>`;
+  }
+  const rotateFix = type==="ts" ? ' style="transform:rotate(-45deg)"' : '';
+  return `<svg viewBox="0 0 24 24" width="${s}" height="${s}"${rotateFix} aria-hidden="true">${inner}</svg>`;
+}
+
+function iconFor(m, selected){
+  const size = SIZES[m.type];
+  const cls = shapeClassFor(m.type);
+  const color = COLORS[m.type];
+  const fill = (m.type==="ts" || m.type==="town" || m.type==="burned" || m.type==="exec") ? "#15150f" : color;
+  const label = labelFor(m);
+  const selCls = selected ? " lm-selected" : "";
+  let labelStyle = "";
+  if(m.type==="town") labelStyle = "color:var(--brass-bright);font-size:9.5px;";
+  else if(m.type==="burned") labelStyle = "color:#e08a5c;font-size:9.5px;font-style:italic;";
+  else if(m.type==="exec") labelStyle = "color:#c77a7a;font-size:9.5px;";
+  else if(m.type==="airfield") labelStyle = "color:#a9d9ee;font-size:9.5px;";
+  const emblem = unitEmblemSVG(m.type, size);
+  return L.divIcon({
+    className:"lm-icon-wrap",
+    html:`
+      <div class="lm-wrap${selCls}" data-id="${m.id}">
+        <div class="lm-shape ${cls}" style="--s:${size}px;--c:${color};--f:${fill}">${emblem}</div>
+        <span class="lm-label" style="${labelStyle}">${label}</span>
+      </div>`,
+    iconSize:[150, size],
+    iconAnchor:[size/2, size/2],
+  });
+}
+
+const markerLayer = L.layerGroup().addTo(map);
+const leafletMarkers = {};
+let selectedId = null;
+
+ALL_MARKERS.forEach(m=>{
+  const mk = L.marker(m.loc, { icon: iconFor(m, false) });
+  mk.on('click', ()=> selectMarker(m.id));
+  mk.addTo(markerLayer);
+  leafletMarkers[m.id] = mk;
+});
+
+/* --- zjednodušený obrys Slovenska pre vrstvu nemeckej okupácie ---
+   Orientačný, zjednodušený polygón (nie presné historické hranice). */
+const SLOVAKIA_OUTLINE = [
+  [48.15,17.05],[48.85,17.05],[49.05,17.55],[49.20,17.95],[49.48,18.55],
+  [49.50,19.05],[49.40,19.45],[49.35,19.90],[49.32,20.35],[49.45,20.95],
+  [49.58,21.55],[49.35,22.35],[49.00,22.55],[48.60,22.25],[48.35,21.60],
+  [48.20,20.60],[48.05,19.55],[47.78,19.10],[47.75,18.20],[47.98,17.75],
+  [48.00,17.15],[48.15,17.05]
+];
+
+/* --- Nemecká okupácia: červená plocha pokrývajúca Slovensko s "dierou"
+   presne tam, kde sa v danom čase nachádza povstalecké územie. Keď front
+   zanikne, diera zmizne a červená pokryje celé územie — Nemci ovládajú
+   celé Slovensko. --- */
+let germanOccupationPolygon = L.polygon([SLOVAKIA_OUTLINE], {
+  color:"#7a2420", weight:1.4, fillColor:"#7a2420", fillOpacity:.20,
+  dashArray:"5,4", className:"german-occupation-path", interactive:true,
+}).addTo(map);
+
+germanOccupationPolygon.on('click', function(e){
+  const ph = phaseForDate(dateAt(+slider.value));
+  const isFull = ph.pts.length === 0;
+  const content = isFull
+    ? `<strong>Nemecká okupácia</strong><br>Po rozpade organizovaného frontu ovládajú nemecké jednotky prakticky celé územie Slovenska; boj pokračuje už len ako partizánska vojna v horách.<br><span class="tp-note">Hranica je orientačná rekonštrukcia dobového územia Slovenského štátu, nie presná vojenská mapa.</span>`
+    : `<strong>Nemecká okupácia</strong><br>Územie mimo povstaleckej "diery" kontrolujú nemecké jednotky a formálne aj vláda Slovenského štátu v Bratislave.<br><span class="tp-note">Hranica je orientačná rekonštrukcia, nie presná vojenská mapa.</span>`;
+  L.popup({className:'territory-popup', maxWidth:260})
+    .setLatLng(e.latlng)
+    .setContent(content)
+    .openOn(map);
+});
+
+let showGermanOccupation = true;
+function updateGermanOccupation(currentDate){
+  if(!showGermanOccupation){ germanOccupationPolygon.setLatLngs([]); return; }
+  const ph = phaseForDate(currentDate);
+  const rings = ph.pts.length ? [SLOVAKIA_OUTLINE, ph.pts] : [SLOVAKIA_OUTLINE];
+  germanOccupationPolygon.setLatLngs(rings);
+}
+
+/* --- frontová línia (povstalecké územie) — biela/krémová plocha
+   s tenkým zlatým lemom, aby jasne kontrastovala s červenou okupáciou
+   aj modrým sovietskym postupom --- */
+let territoryPolygon = L.polygon([], {
+  color: "#dab766", weight: 2.4, fillColor: "#f2ede0", fillOpacity: .45, className: "territory-path",
+}).addTo(map);
+territoryPolygon.bringToFront();
+
+territoryPolygon.on('click', function(e){
+  const ph = phaseForDate(dateAt(+slider.value));
+  const isEmpty = ph.pts.length === 0;
+  const content = isEmpty
+    ? `<strong>Front sa rozpadol</strong><br>Organizovaný odpor už tu neexistuje — boj pokračuje ako partizánska vojna v horách.<br><span class="tp-note">Kliknuté miesto sa nachádzalo na povstaleckom území pred rozpadom frontu.</span>`
+    : `<strong>Povstalecké územie</strong><br>${ph.label}<br><span class="tp-note">Toto miesto bolo v uvedenom období pod kontrolou povstaleckej armády a partizánov. Hranica je orientačná rekonštrukcia, nie presná vojenská mapa.</span>`;
+  L.popup({className:'territory-popup', maxWidth:250})
+    .setLatLng(e.latlng)
+    .setContent(content)
+    .openOn(map);
+});
+
+/* --- kruh symbolizujúci ústup do hôr po rozpade frontu --- */
+let retreatCircle = L.circle([48.9436, 19.5814], {
+  radius: 26000, color:"#dab766", weight:1.6, dashArray:"4,4",
+  fillColor:"#dab766", fillOpacity:.06,
+}); // pridá sa do mapy až keď front zanikne
+
+retreatCircle.on('click', function(e){
+  L.popup({className:'territory-popup', maxWidth:250})
+    .setLatLng(e.latlng)
+    .setContent(`<strong>Ústupový priestor do hôr</strong><br>Nízke Tatry — orientačná oblasť, kam sa po rozpade frontu stiahli zvyšky povstaleckej armády a pokračovali v partizánskom odpore.`)
+    .openOn(map);
+});
+
+/* --- Východný front: Karpatsko-duklianska operácia ---
+   Samostatná prepínateľná vrstva zobrazujúca postup Červenej armády
+   a 1. čs. armádneho zboru cez Karpaty, ktorý mal priniesť pomoc SNP.
+   Súradnice sú priame lat/lon (žiadny prepočet netreba, keďže ide
+   priamo o Leaflet vrstvu). Tvary sú zjednodušené a orientačné. */
+const EASTERN_FRONT_PHASES = [
+  {
+    from:"1944-09-08", to:"1944-09-19",
+    label:"Karpatsko-duklianska operácia začína — postup na Krosno a Duklu",
+    pts:[[49.78,21.35],[49.78,22.05],[49.50,22.05],[49.42,21.85],[49.40,21.55],[49.50,21.35]]
+  },
+  {
+    from:"1944-09-20", to:"1944-10-05",
+    label:"Mesto Dukla dobyté — boje o Duklianský priesmyk",
+    pts:[[49.78,21.35],[49.78,22.05],[49.50,22.05],[49.40,21.85],[49.38,21.60],[49.45,21.35]]
+  },
+  {
+    from:"1944-10-06", to:"1944-10-27",
+    label:"Dukliansky priesmyk dobytý — postup uviazol pred Svidníkom",
+    pts:[[49.78,21.35],[49.78,22.05],[49.50,22.05],[49.30,21.95],[49.28,21.75],[49.30,21.55],[49.38,21.35]]
+  },
+  {
+    from:"1944-10-28", to:"1945-01-19",
+    label:"Front zamrzol — SNP padlo skôr, než sa operácia stihla prebiť",
+    pts:[[49.78,21.35],[49.78,22.05],[49.50,22.05],[49.30,21.95],[49.28,21.75],[49.30,21.55],[49.38,21.35]]
+  },
+];
+
+let easternFrontPolygon = L.polygon([], {
+  color:"#4a7ab8", weight:2, fillColor:"#4a7ab8", fillOpacity:.16, dashArray:"7,5", className:"eastern-front-path",
+}).addTo(map);
+
+let showEasternFront = true;
+let lastEasternPhaseLabel = null;
+
+function easternFrontForDate(d){
+  return EASTERN_FRONT_PHASES.find(p => d>=D(p.from) && d<=D(p.to)) || null;
+}
+
+function updateEasternFront(currentDate){
+  const ph = easternFrontForDate(currentDate);
+  const pts = (showEasternFront && ph) ? ph.pts : [];
+  const label = ph ? ph.label : null;
+  if(label !== lastEasternPhaseLabel){
+    lastEasternPhaseLabel = label;
+    easternFrontPolygon.setStyle({opacity:0, fillOpacity:0});
+    setTimeout(()=>{
+      easternFrontPolygon.setLatLngs(pts);
+      easternFrontPolygon.setStyle({opacity: pts.length?.85:0, fillOpacity: pts.length?.16:0});
+    }, 150);
+  } else {
+    easternFrontPolygon.setLatLngs(pts);
+  }
+}
+
+easternFrontPolygon.on('click', function(e){
+  L.popup({className:'territory-popup', maxWidth:270})
+    .setLatLng(e.latlng)
+    .setContent(`<strong>Karpatsko-duklianska operácia</strong><br>Útok sovietskej 38. armády a 1. československého armádneho zboru (gen. Ludvík Svoboda) cez Karpaty na pomoc SNP.<br><span class="tp-note">8. sept. – 28. okt. 1944. Straty: vyše 21 000 sovietskych a 1 800 československých vojakov, nemecké straty cez 52 000. Napriek dobytiu Duklianskeho priesmyku (6. okt.) sa operácia k povstalcom cez tuhý horský odpor včas neprebila — Svidník a Prešov boli oslobodené až v januári 1945.</span>`)
+    .openOn(map);
+});
+
+// správne vizuálne poradie vrstiev: červená okupácia dole, modrý sovietsky
+// postup v strede, biele povstalecké územie navrchu
+germanOccupationPolygon.bringToBack();
+easternFrontPolygon.bringToFront();
+territoryPolygon.bringToFront();
+
+/* ============================================================
+   INFO PANEL + POP-UP OKNO NAD MAPOU
+   ============================================================ */
+const infoPanel = document.getElementById("infoPanel");
+
+function kickerFor(type){
+  return {cmd:"Velenie povstania", ts:"Taktická skupina", pz:"Partizánsky oddiel", de:"Nemecká jednotka", govt:"Vedenie Slovenského štátu", vsa:"Východoslovenská armáda", town:"Dôležité miesto", airfield:"Letisko / vzdušný most", burned:"Vypálená obec", exec:"Miesto masovej popravy", person:"Osobnosť SNP"}[type];
+}
+
+const mapModalBackdrop = document.getElementById("mapModalBackdrop");
+const mapModal = document.getElementById("mapModal");
+
+function wikiFilePath(filename){
+  return "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(filename);
+}
+function wikiFilePageUrl(filename){
+  return "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(filename.replace(/ /g,"_"));
+}
+
+function sourcesLineFor(type){
+  const map = {
+    cmd:"Múzeum SNP (muzeumsnp.sk) · Ústav pamäti národa (upn.gov.sk) · Wikipédia",
+    ts:"Wikipédia — Taktické skupiny počas SNP · Ministerstvo obrany SR (mosr.sk) · Pravda.sk",
+    pz:"Vojenský historický ústav (vhu.sk) · Wikipédia",
+    de:"Palba.cz · Wikipédia",
+    govt:"Wikipédia · Denník N · bystricoviny.sk",
+    vsa:"Wikipédia — Východoslovenská armáda · HistoryLab.sk · noveslovo.sk",
+    town:"Múzeum SNP · Wikipédia",
+    airfield:"sliacdnes.sk · Wikipédia — Letisko Sliač · MY Zvolen (SME)",
+    burned:"Wikipédia — Zoznam vypálených obcí na Slovensku · TASR / teraz.sk · Múzeum SNP",
+    exec:"Wikipédia — Masaker v Kremničke · bystricoviny.sk · standard.sk",
+    person:"Denník N — 10 tvárí SNP · HistoryLab.sk · Národná banka Slovenska · Pravda.sk · Wikipédia",
+  };
+  return map[type] || "Múzeum SNP · Ústav pamäti národa · Wikipédia";
+}
+
+function photoThumbHTML(m){
+  if(!m.photo) return "";
+  const imgUrl = wikiFilePath(m.photo.file);
+  return `
+    <div class="info-thumb">
+      <img src="${imgUrl}" alt="${m.name}" loading="lazy"
+           onerror="this.closest('.info-thumb').style.display='none'">
+    </div>`;
+}
+function photoCreditHTML(m){
+  if(!m.photo) return "";
+  const pageUrl = wikiFilePageUrl(m.photo.file);
+  return `<div class="info-photo-credit-line">Foto: ${m.photo.credit} · <a href="${pageUrl}" target="_blank" rel="noopener">zdroj</a></div>`;
+}
+
+function cardInnerHTML(m){
+  return `
+    <div class="card-head-row">
+      ${photoThumbHTML(m)}
+      <div class="card-head-text">
+        <p class="info-kicker ${m.type}">${kickerFor(m.type)}</p>
+        <h3 class="info-title">${m.name}</h3>
+        <p class="info-sub">${m.role || m.commander || ""}${m.hq ? " · "+m.hq : ""}</p>
+      </div>
+    </div>
+    ${photoCreditHTML(m)}
+    <div class="info-body">${m.bio.map(p=>`<p>${p}</p>`).join("")}</div>
+    <span class="info-dates">${fmtShort(D(m.from))} – ${fmtShort(D(m.to))} 1944</span>
+    <div class="info-sources">Zdroje informácií: ${sourcesLineFor(m.type)}</div>
+  `;
+}
+
+function cardHTML(m, closeBtnId){
+  return `
+    <button class="close-x" id="${closeBtnId}">✕ zavrieť</button>
+    ${cardInnerHTML(m)}
+    <button class="goto-article-btn" onclick="goToArticleFromPopup('${m.id}','${m.type}')">📖 Čítať viac v prehľade</button>
+  `;
+}
+
+function articleCardHTML(m){
+  return `
+    <article class="article-card" id="art-${m.id}">
+      <button class="goto-map-btn" onclick="showOnMap('${m.id}')">🗺️ Zobraziť na mape</button>
+      <button class="goto-map-btn" onclick="copyArticleLink('${m.id}','${m.type}', this)">🔗 Kopírovať odkaz</button>
+      ${cardInnerHTML(m)}
+    </article>
+  `;
+}
+
+function copyArticleLink(id, type, btnEl){
+  const pageKey = pageForType(type);
+  const url = location.origin + location.pathname + '#' + pageKey + '/' + id;
+  const done = ()=>{
+    const original = btnEl.textContent;
+    btnEl.textContent = '✓ Odkaz skopírovaný';
+    setTimeout(()=> btnEl.textContent = original, 1800);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(done).catch(()=> prompt('Skopírujte odkaz:', url));
+  } else {
+    prompt('Skopírujte odkaz:', url);
+  }
+}
+
+function selectMarker(id){
+  if(typeof playing !== "undefined" && playing) stopPlayback();
+  selectedId = id;
+  refreshMarkerStates();
+  const m = ALL_MARKERS.find(x=>x.id===id);
+  if(!m) return;
+
+  map.panTo(m.loc, {animate:true});
+
+  // bočný panel
+  infoPanel.innerHTML = cardHTML(m, "closeInfo");
+  document.getElementById("closeInfo").addEventListener("click", closeSidebarInfo);
+
+  // pop-up okno nad mapou
+  mapModal.innerHTML = cardHTML(m, "closeMapModal");
+  mapModalBackdrop.classList.add("open");
+  document.getElementById("closeMapModal").addEventListener("click", closeMapModal);
+}
+
+function closeSidebarInfo(){
+  selectedId=null; refreshMarkerStates();
+  infoPanel.innerHTML = `<div class="info-empty" id="infoEmpty">Kliknite na ktorúkoľvek značku na mape — veliteľa, taktickú skupinu, partizánsky oddiel či nemeckú jednotku — a zobrazí sa tu jej príbeh, dátumy pôsobenia a súvislosti.</div>`;
+}
+
+function closeMapModal(){
+  mapModalBackdrop.classList.remove("open");
+  selectedId=null; refreshMarkerStates();
+}
+
+mapModalBackdrop.addEventListener("click",(e)=>{
+  if(e.target === mapModalBackdrop) closeMapModal();
+});
+document.addEventListener("keydown",(e)=>{
+  if(e.key === "Escape" && mapModalBackdrop.classList.contains("open")) closeMapModal();
+});
+
+const hiddenTypes = new Set();
+
+function refreshMarkerStates(){
+  const currentDate = dateAt(+slider.value);
+  ALL_MARKERS.forEach(m=>{
+    const active = currentDate >= D(m.from) && currentDate <= D(m.to);
+    const filteredOut = hiddenTypes.has(m.type);
+    const mk = leafletMarkers[m.id];
+    mk.setIcon(iconFor(m, m.id===selectedId));
+    const el = mk.getElement();
+    if(el){
+      el.classList.toggle("lm-inactive", !active);
+      el.style.display = filteredOut ? "none" : "";
+    }
+  });
+}
+
+document.querySelectorAll('#legendFilter span[data-type]').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    const t = el.dataset.type;
+    if(hiddenTypes.has(t)) hiddenTypes.delete(t);
+    else hiddenTypes.add(t);
+    el.classList.toggle('legend-off', hiddenTypes.has(t));
+    refreshMarkerStates();
+  });
+});
+
+/* ============================================================
+   ČASOVÁ OS
+   ============================================================ */
+const slider = document.getElementById("dateSlider");
+slider.max = dayCount;
+const dateDisplay = document.getElementById("dateDisplay");
+const phaseLabel = document.getElementById("phaseLabel");
+const feedList = document.getElementById("feedList");
+const feedCount = document.getElementById("feedCount");
+
+// milestone body na časovej osi
+const milestonesWrap = document.getElementById("milestones");
+EVENTS.forEach(([dateStr, text])=>{
+  const idx = Math.round((D(dateStr)-START)/86400000);
+  const pct = (idx/dayCount)*100;
+  const dot = document.createElement("div");
+  dot.className="milestone-dot";
+  dot.style.left = pct+"%";
+  dot.title = fmtDate(D(dateStr))+" — "+text;
+  dot.addEventListener("click",()=>{ slider.value = idx; updateAll(); });
+  milestonesWrap.appendChild(dot);
+});
+
+let lastPhaseLabel = null;
+function updateTerritory(currentDate){
+  const ph = phaseForDate(currentDate);
+  phaseLabel.textContent = ph.label;
+  const isEmpty = ph.pts.length === 0;
+
+  const applyShape = ()=>{
+    if(isEmpty){
+      territoryPolygon.setLatLngs([]);
+      if(!map.hasLayer(retreatCircle)) retreatCircle.addTo(map);
+    } else {
+      territoryPolygon.setLatLngs(ph.pts);
+      if(map.hasLayer(retreatCircle)) map.removeLayer(retreatCircle);
+    }
+  };
+
+  if(ph.label !== lastPhaseLabel){
+    // front sa skutočne zmenil (nová fáza) — jemný cross-fade namiesto trhavého skoku
+    lastPhaseLabel = ph.label;
+    territoryPolygon.setStyle({opacity:0, fillOpacity:0});
+    setTimeout(()=>{
+      applyShape();
+      territoryPolygon.setStyle({opacity:.9, fillOpacity:.22});
+    }, 180);
+  } else {
+    applyShape();
+  }
+}
+
+function updateFeed(currentDate){
+  const upto = EVENTS.filter(([dstr])=> D(dstr) <= currentDate);
+  feedCount.textContent = upto.length;
+  feedList.innerHTML = upto.slice().reverse().map(([dstr,text])=>`
+    <li class="feed-item"><span class="fd-date">${fmtShort(D(dstr))} 1944</span>${text}</li>
+  `).join("") || `<li class="feed-item" style="color:var(--parchment-dim)">Zatiaľ žiadne udalosti — posuňte časovú os.</li>`;
+}
+
+function updateAll(){
+  const idx = +slider.value;
+  const currentDate = dateAt(idx);
+  dateDisplay.innerHTML = `${currentDate.getDate()}. <span class="d-num">${["januára","februára","marca","apríla","mája","júna","júla","augusta","septembra","októbra","novembra","decembra"][currentDate.getMonth()]}</span> ${currentDate.getFullYear()}`;
+  updateTerritory(currentDate);
+  updateGermanOccupation(currentDate);
+  updateEasternFront(currentDate);
+  updateFeed(currentDate);
+  refreshMarkerStates();
+}
+
+slider.addEventListener("input", updateAll);
+
+function goTo(idx){
+  slider.value = Math.max(0, Math.min(dayCount, idx));
+  updateAll();
+}
+
+document.getElementById("stepDayFwd").addEventListener("click", ()=> goTo(+slider.value + 1));
+document.getElementById("stepDayBack").addEventListener("click", ()=> goTo(+slider.value - 1));
+document.getElementById("stepWeekFwd").addEventListener("click", ()=> goTo(+slider.value + 7));
+document.getElementById("stepWeekBack").addEventListener("click", ()=> goTo(+slider.value - 7));
+
+/* --- prehrávanie --- */
+let playing=false, playTimer=null;
+let playIntervalMs = 500;
+let playStepDays = 1;
+
+const playBtn = document.getElementById("playBtn");
+const speedSelect = document.getElementById("speedSelect");
+const stepSelect = document.getElementById("stepSelect");
+
+function startPlayback(){
+  clearInterval(playTimer);
+  playTimer = setInterval(()=>{
+    let v = +slider.value;
+    if(v >= dayCount){ stopPlayback(); return; }
+    goTo(v + playStepDays);
+  }, playIntervalMs);
+}
+function stopPlayback(){
+  playing = false;
+  playBtn.textContent = "▶";
+  clearInterval(playTimer);
+}
+
+playBtn.addEventListener("click",()=>{
+  playing = !playing;
+  playBtn.textContent = playing ? "❚❚" : "▶";
+  if(playing){
+    if(+slider.value >= dayCount) goTo(0);
+    startPlayback();
+  } else {
+    stopPlayback();
+  }
+});
+
+speedSelect.addEventListener("change",()=>{
+  playIntervalMs = +speedSelect.value;
+  if(playing) startPlayback(); // reštart s novou rýchlosťou
+});
+stepSelect.addEventListener("change",()=>{
+  playStepDays = +stepSelect.value;
+});
+
+updateAll();
+setTimeout(()=> map.invalidateSize(), 200);
+
+/* ============================================================
+   NAVIGÁCIA A PODSTRÁNKY — kompletný informačný prehľad
+   ============================================================ */
+
+let suppressHashUpdate = false;
+
+function showPage(pageKey, opts={}){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const target = document.getElementById('page-'+pageKey);
+  if(!target) pageKey = 'map';
+  (document.getElementById('page-'+pageKey) || document.getElementById('page-map')).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.page===pageKey));
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(pageKey==='map') setTimeout(()=> map.invalidateSize(), 60);
+
+  if(!opts.skipHashUpdate){
+    suppressHashUpdate = true;
+    const hash = '#' + pageKey + (opts.artId ? '/'+opts.artId : '');
+    history.pushState(null, '', hash);
+    setTimeout(()=> suppressHashUpdate = false, 0);
+  }
+}
+
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=> showPage(btn.dataset.page));
+});
+
+function pageForType(type){
+  if(type==='cmd' || type==='govt' || type==='vsa') return 'command';
+  if(type==='person') return 'personalities';
+  if(type==='ts') return 'tactical';
+  if(type==='pz' || type==='de') return 'partisans';
+  if(type==='town' || type==='airfield') return 'places';
+  if(type==='burned' || type==='exec') return 'reprisals';
+  return 'map';
+}
+
+function gotoArticle(id, type, opts={}){
+  const pageKey = pageForType(type);
+  showPage(pageKey, {...opts, artId:id});
+  setTimeout(()=>{
+    const el = document.getElementById('art-'+id);
+    if(el){
+      el.scrollIntoView({behavior:'smooth', block:'start'});
+      el.classList.add('flash');
+      setTimeout(()=> el.classList.remove('flash'), 1600);
+    }
+  }, 120);
+}
+
+function goToArticleFromPopup(id, type){
+  closeMapModal();
+  closeSidebarInfo();
+  gotoArticle(id, type);
+}
+
+function showOnMap(id){
+  suppressHashUpdate = true;
+  history.pushState(null, '', '#map');
+  setTimeout(()=> suppressHashUpdate = false, 0);
+  showPage('map', {skipHashUpdate:true});
+  setTimeout(()=> selectMarker(id), 180);
+}
+
+/* --- navigácia späť/dopredu v prehliadači a priame odkazy (#stránka/id) --- */
+function routeFromHash(){
+  const raw = location.hash.replace(/^#/, '');
+  if(!raw){ showPage('map', {skipHashUpdate:true}); return; }
+  const [pageKey, artId] = raw.split('/');
+  if(artId){
+    const m = ALL_MARKERS.find(x=>x.id===artId);
+    if(m){ gotoArticle(m.id, m.type, {skipHashUpdate:true}); return; }
+  }
+  showPage(pageKey || 'map', {skipHashUpdate:true});
+}
+
+window.addEventListener('popstate', ()=>{
+  if(suppressHashUpdate) return;
+  routeFromHash();
+});
+
+/* --- vygenerovanie obsahu jednotlivých podstránok --- */
+
+document.getElementById('page-prologue').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Pozadie a príčiny: ako sa k povstaniu dospelo</h2>
+    <p class="page-intro">Skôr než 29. augusta 1944 padol prvý výstrel, predchádzalo tomu päť rokov vývoja — od vzniku vojnového Slovenského štátu, cez zlom na frontoch druhej svetovej vojny, až po tajné dohody odbojárov v bratislavských bytoch. Táto stránka zhŕňa širší kontext pre čitateľa, ktorý sa s témou stretáva prvýkrát.</p>
+
+    <h3 class="section-heading">Slovenský štát po boku Nemecka (1939 – 1944)</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>Po rozpade Česko-Slovenska v marci 1939 vznikol samostatný Slovenský štát na čele s prezidentom Jozefom Tisom. Krajina sa politicky aj vojensky pridala na stranu nacistického Nemecka — slovenské jednotky sa zúčastnili útoku na Poľsko (1939) aj na Sovietsky zväz (od 1941) a Slovenský štát aktívne spolupracoval na deportáciách svojich židovských občanov do koncentračných a vyhladzovacích táborov.</p>
+        <p>Autoritatívny režim jedinej povolenej strany (Hlinkovej slovenskej ľudovej strany) postupne narážal na rastúcu nespokojnosť časti spoločnosti — vojenských dôstojníkov, demokratických politikov aj komunistov, ktorí pôsobili v ilegalite po zákaze Komunistickej strany Slovenska v roku 1939.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Wikipédia — Slovenský štát, Jozef Tiso · Ústav pamäti národa</div>
+    </div>
+
+    <h3 class="section-heading">Vianočná dohoda (december 1943) — odboj sa zjednocuje</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>Tesne pred Vianocami 1943 sa v byte Mateja Joska na Gajovej ulici v Bratislave tajne stretli zástupcovia dvoch dovtedy oddelených prúdov odboja — občianskeho (Jozef Lettrich, Ján Ursíny, Matej Josko) a komunistického (Karol Šmidke, Gustáv Husák, Laco Novomeský). Podpísali dokument, ktorý vošiel do dejín ako Vianočná dohoda.</p>
+        <p>Dohoda ustanovila ilegálnu Slovenskú národnú radu (SNR) ako jednotný celonárodný orgán odboja s dvoma cieľmi: zvrhnúť Tisov režim, keď na to nastane vhodná chvíľa, a po vojne obnoviť Česko-Slovenskú republiku na princípe rovnosti slovenského a českého národa. Práve táto SNR neskôr počas povstania vyšla z ilegality a prevzala politickú správu oslobodeného územia.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Wikipédia — Vianočná dohoda · TASR/teraz.sk · Postoj.sk</div>
+    </div>
+
+    <h3 class="section-heading">Vojnová situácia v roku 1944 — Nemecko ustupuje na všetkých frontoch</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>Rok 1944 znamenal pre nacistické Nemecko zlom. Na východe sa po víťazstve pri Stalingrade (1943) a Kursku Červená armáda nezadržateľne blížila k predvojnovým hraniciam Poľska a Karpát. Na západe 6. júna 1944 vylodili spojenci v Normandii a otvorili druhý front vo Francúzsku. Pre malé Nemecku podriadené štáty, akým bol aj Slovenský štát, sa čoraz jasnejšie ukazovalo, že Os prehráva vojnu.</p>
+        <p>Odbojové skupiny na Slovensku — vojenské aj partizánske — preto plánovali svoj postup s ohľadom práve na postup Červenej armády ku karpatským priesmykom. Počítalo sa s tým, že v okamihu, keď sa sovietske jednotky priblížia k slovenským hraniciam, umožnia im dve východoslovenské divízie voľný prechod cez Karpaty, zatiaľ čo posádky na strednom Slovensku vyhlásia povstanie proti nemeckým silám.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Wikipédia — Slovenské národné povstanie, Východný front · Ústav pamäti národa</div>
+    </div>
+
+    <h3 class="section-heading">Vojenská príprava odboja — Golian a máj 1944</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>23. marca 1944 poveril exilový prezident Edvard Beneš z Londýna dočasným vedením vojenského odboja na Slovensku podplukovníka Jána Goliana, dovtedajšieho náčelníka štábu Veliteľstva pozemného vojska v Banskej Bystrici. Od mája 1944 potom skupina dôstojníkov pod jeho vedením tajne pripravovala plán ozbrojeného povstania.</p>
+        <p>Podľa optimálneho scenára mal ozbrojený boj vypuknúť v koordinácii so sovietskou stranou vo chvíli, keď sa Červená armáda priblíži ku Krakovu a karpatským hrebeňom. Krízový (núdzový) scenár počítal s vyhlásením odporu okamžite, ak by nemecké vojská začali predčasne obsadzovať Slovensko — presne to sa napokon aj stalo.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Ústav pamäti národa · Pravda.sk · Wikipédia</div>
+    </div>
+
+    <h3 class="section-heading">Partizánske hnutie naberá na sile (leto 1944)</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>Súbežne s vojenskými prípravami sa od jari a leta 1944 na strednom a východnom Slovensku formovali partizánske skupiny — časť z nich organizovali domáci komunisti, časť tvorili sovietski dôstojníci a vojaci vysadení alebo prebehnutí z východného frontu, napojení na Ukrajinský štáb partizánskeho hnutia v Kyjeve.</p>
+        <p>Od polovice augusta 1944 tieto skupiny čoraz otvorenejšie útočili na komunikácie, sklady a príslušníkov nemeckej menšiny. Symbolickým vyvrcholením bolo obsadenie Ružomberka partizánmi 27. augusta 1944 — strategicky dôležitého železničného uzla s vojenskou výrobou. Táto udalosť v Berlíne vyvolala značné znepokojenie a urýchlila rozhodnutie o vojenskom obsadení Slovenska.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Ústav pamäti národa · Wikipédia — Partizánske hnutie na Slovensku</div>
+    </div>
+
+    <h3 class="section-heading">Posledné dni pred búrkou (25. – 29. august 1944)</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>Situácia sa vyostrovala hodinu po hodine. 11. augusta 1944 vyhlásila slovenská vláda na celom území stanné právo. 25. augusta vydal Golian tajnú inštrukciu posádkam, aby v prípade prekročenia hraníc nemeckými vojskami kládli ozbrojený odpor. O niekoľko dní neskôr boli na slovenskom území zlikvidovaní členovia nemeckej vojenskej misie vracajúcej sa z Rumunska — čo Nemcom poskytlo priamu zámienku na zásah.</p>
+        <p>Ráno 29. augusta 1944 prekročili nemecké vojská slovenské hranice a začali okupovať krajinu. Podvečer minister obrany Ferdinand Čatloš v rozhlase oznámil, že vláda „pozvala“ nemeckú armádu na pomoc proti partizánom. Krátko po 20. hodine reagoval Golian heslom „Začnite s vysťahovaním!“ — a Slovenské národné povstanie sa tým oficiálne začalo.</p>
+        <p>Od tohto bodu sa už dej dá sledovať deň po dni priamo na mape a v <a href="#" onclick="showPage('timeline'); return false;" style="color:var(--brass-bright)">kompletnej chronológii</a>.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Ústav pamäti národa · TASR/teraz.sk · bystricoviny.sk</div>
+    </div>
+
+    <h3 class="section-heading">Zlomový bod: Maďarsko zostáva pri Osi (15. október 1944)</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>Povstalci dostali už len jednu reálnu šancu, ktorá mohla nepriaznivý vývoj radikálne zvrátiť: pripravovanú kapituláciu susedného Maďarska. Maďarský regent Miklós Horthy sa v polovici októbra 1944 pokúsil vyjednať prímerie so Sovietskym zväzom a vystúpiť z vojny po boku Nemecka — čo by pre povstanie znamenalo uvoľnenie frontu od juhu.</p>
+        <p>Nemci však boli na tento krok pripravení. 15. októbra 1944 uniesol nemecký komandos Otta Skorzenyho Horthyho syna a nemecké jednotky obsadili kľúčové body Budapešti (operácia „Panzerfaust“). Horthy bol donútený svoju výzvu odvolať a nasledujúci deň, 16. októbra, odovzdal moc fašistickej strane Šípových krížov na čele s Ferencom Szálasim. Maďarsko tak zostalo násilne v tábore Osi.</p>
+        <p>Táto udalosť mala pre SNP zásadné dôsledky: uvoľnila Nemcom ruky na juhu a umožnila im v rovnakom čase dokončiť presuny a posily okupačných vojsk na Slovensku. Ich generálna ofenzíva proti povstaleckému územiu sa spustila už o tri dni neskôr, 18. októbra 1944, a práve na východnom a južnom úseku frontu sa útok Nemcom podarilo najrýchlejšie pretlačiť — čo priamo prispelo k pádu Banskej Bystrice o necelé dva týždne neskôr.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Ústav pamäti národa — 27. október: porážka SNP · maďarské historické zdroje (honvedelem.hu) · Wikipédia</div>
+    </div>
+  </div>
+`;
+
+document.getElementById('page-command').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Velenie povstania, štátne vedenie a Východoslovenská armáda</h2>
+    <p class="page-intro">Kto povstanie organizoval a viedol, kto stál na strane Slovenského štátu v Bratislave a čo sa stalo s armádou, ktorá mala otvoriť Karpaty Červenej armáde.</p>
+
+    <h3 class="section-heading">Povstalecké velenie</h3>
+    ${COMMANDERS.map(articleCardHTML).join('')}
+
+    <h3 class="section-heading">Vedenie Slovenského štátu (Bratislava)</h3>
+    ${GOVERNMENT.map(articleCardHTML).join('')}
+
+    <h3 class="section-heading">Východoslovenská armáda</h3>
+    ${VSA.map(articleCardHTML).join('')}
+  </div>
+`;
+
+document.getElementById('page-personalities').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Ďalšie významné osobnosti SNP</h2>
+    <p class="page-intro">SNP nemalo jednu vedúcu postavu — bolo výsledkom spolupráce (a napätia) medzi vojenským velením, komunistickým a občianskym (demokratickým) krídlom odboja aj hospodárskymi odborníkmi, ktorí povstanie potichu financovali. Vojenských veliteľov a vedenie Slovenského štátu nájdete v záložke <em>Velenie a štát</em> — tu sú ďalšie kľúčové mená.</p>
+    ${PERSONALITIES.map(articleCardHTML).join('')}
+  </div>
+`;
+
+document.getElementById('page-tactical').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Šesť taktických skupín</h2>
+    <p class="page-intro">10. septembra 1944 bola povstalecká armáda reorganizovaná na šesť taktických skupín — Kriváň, Fatra, Gerlach, Muráň, Ďumbier a Zobor — aby lepšie zvládala obranu jednotlivých frontových úsekov okolo Banskej Bystrice.</p>
+    ${TACTICAL_GROUPS.map(articleCardHTML).join('')}
+  </div>
+`;
+
+document.getElementById('page-partisans').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Partizánske oddiely a nemecké jednotky</h2>
+    <p class="page-intro">Popri pravidelnej povstaleckej armáde bojovali na povstaleckom území aj sovietsko-slovenské partizánske zväzky. Proti nim stáli nemecké bojové skupiny nasadené na potlačenie SNP.</p>
+
+    <h3 class="section-heading">Partizánske oddiely</h3>
+    ${PARTISANS.map(articleCardHTML).join('')}
+
+    <h3 class="section-heading">Nemecké jednotky</h3>
+    ${GERMAN_GROUPS.map(articleCardHTML).join('')}
+  </div>
+`;
+
+document.getElementById('page-places').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Dôležité mestá a letiská</h2>
+    <p class="page-intro">Mestá, ktoré zohrali kľúčovú úlohu v priebehu povstania, a letiská, cez ktoré prúdila spojenecká pomoc a spojenie so svetom.</p>
+
+    <h3 class="section-heading">Dôležité mestá</h3>
+    ${KEY_TOWNS.map(articleCardHTML).join('')}
+
+    <h3 class="section-heading">Letiská a vzdušný most</h3>
+    ${AIRFIELDS.map(articleCardHTML).join('')}
+  </div>
+`;
+
+document.getElementById('page-reprisals').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Represálie: vypálené obce a masové popravy</h2>
+    <p class="page-intro">Po potlačení organizovaného odporu nasledovala vlna krutých represálií proti civilnému obyvateľstvu, ktorá trvala až do jari 1945. Na Slovensku bolo takto vypálených celkovo vyše 100 obcí a osád a zavraždených tisíce ľudí.</p>
+
+    <h3 class="section-heading">Vypálené obce</h3>
+    ${BURNED_VILLAGES.map(articleCardHTML).join('')}
+
+    <h3 class="section-heading">Miesta masových popráv</h3>
+    ${EXECUTION_SITES.map(articleCardHTML).join('')}
+  </div>
+`;
+
+document.getElementById('page-timeline').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Kompletná chronológia</h2>
+    <p class="page-intro">Všetky udalosti zobrazované postupne aj v dennom denníku na mape, zoradené chronologicky od príprav povstania až po rozpad organizovaného frontu.</p>
+    <ul class="full-timeline">
+      ${EVENTS.map(([d,t])=>`<li><span class="ft-date">${fmtDate(D(d))} 1944</span><span class="ft-text">${t}</span></li>`).join('')}
+    </ul>
+  </div>
+`;
+
+document.getElementById('page-aftermath').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Bilancia a dôsledky</h2>
+    <p class="page-intro">SNP nekončí 28. októbrom 1944 — partizánska vojna pokračovala až do jari 1945 a jeho dôsledky formovali Slovensko na desaťročia dopredu. Tu je stručná bilancia v číslach a hlavné povojnové udalosti.</p>
+
+    <h3 class="section-heading">V číslach</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p><strong>Povstalecká armáda</strong> mala v čase vrcholu okolo 60 000 mužov, k nim treba pripočítať približne 12 000 – 18 000 partizánov v desiatkach oddielov.</p>
+        <p><strong>Karpatsko-duklianska operácia</strong> (8. sept. – 28. okt. 1944), ktorá mala priniesť pomoc: vyše 21 000 padlých/nezvestných sovietskych vojakov a približne 84 000 ranených, 1 630 padlých a 4 069 ranených z 1. čs. armádneho zboru. Nemecké straty sa odhadujú na vyše 52 000 mužov.</p>
+        <p><strong>Represálie po potlačení SNP</strong> (koniec 1944 – jar 1945): na Slovensku bolo vypálených vyše 100 obcí a osád. Len v Kremničke a Nemeckej bolo popravených dovedna okolo 1 500 ľudí — najväčšie zdokumentované vojnové zločiny na našom území.</p>
+        <p>Za účasť v odboji, v bojoch aj pri represáliách zahynuli tisíce Slovákov, Čechov, sovietskych vojakov a partizánov ďalších národností — presné celkové číslo obetí sa v odbornej literatúre stále spresňuje.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Vojenský historický ústav · Ústav pamäti národa · Wikipédia · TASR/teraz.sk</div>
+    </div>
+
+    <h3 class="section-heading">Košický vládny program (5. apríl 1945)</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>Po oslobodení Košíc Červenou armádou 19. januára 1945 sa mesto na niekoľko mesiacov stalo dočasným sídlom obnovenej československej vlády. 5. apríla 1945 tu bol slávnostne vyhlásený Košický vládny program — základný politický dokument, ktorý určil smerovanie povojnového Československa.</p>
+        <p>Program potvrdil obnovenie spoločného štátu Čechov a Slovákov (na rozdiel od Slovenského štátu), sľúbil Slovákom väčšiu národnú svojbytnosť v rámci republiky, nastavil princípy potrestania kolaborantov a vojnových zločincov a naznačil smerovanie k užšej spolupráci so Sovietskym zväzom — čo neskôr uľahčilo komunistický nástup k moci vo februári 1948.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Wikipédia — Košický vládny program · Ústav pamäti národa</div>
+    </div>
+
+    <h3 class="section-heading">Zneužitie odkazu SNP komunistickým režimom</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>Po februári 1948 si komunistický režim odkaz SNP prisvojil ako vlastný — v oficiálnej historiografii sa zveličovala úloha komunistov a sovietskych partizánov, zatiaľ čo príspevok demokratického (občianskeho) krídla odboja, vojenského velenia aj hospodárskych osobností ako Imrich Karvaš sa zamlčiaval alebo bagatelizoval.</p>
+        <p>Viacerí signatári Vianočnej dohody a osobnosti povstania (Ursíny, Lettrich, Karvaš) boli v 50. rokoch samotným komunistickým režimom väznení alebo prinútení emigrovať — paradoxne za presvedčenie, pre ktoré počas SNP riskovali životy. Po roku 1989 sa historický výskum SNP výrazne zobjektívnil.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Ústav pamäti národa · HistoryLab.sk · Denník N</div>
+    </div>
+  </div>
+`;
+
+document.getElementById('page-memory').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Pamäť a odkaz dnes</h2>
+    <p class="page-intro">Ako sa na SNP spomína na Slovensku dnes, viac ako osem desaťročí od jeho vypuknutia.</p>
+
+    <h3 class="section-heading">Štátny sviatok</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>29. august je na Slovensku štátnym sviatkom — Výročie Slovenského národného povstania. Bol ním už za socialistického Československa a zostal ním aj po vzniku samostatnej Slovenskej republiky v roku 1993, čo je pomerne nezvyčajné kontinuum naprieč veľmi odlišnými politickými zriadeniami.</p>
+        <p>Pri príležitosti výročia sa každoročne konajú spomienkové podujatia v Banskej Bystrici za účasti najvyšších ústavných predstaviteľov štátu.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Wikipédia · TASR/teraz.sk</div>
+    </div>
+
+    <h3 class="section-heading">Múzeum SNP a pamätníky</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>Múzeum Slovenského národného povstania v Banskej Bystrici vzniklo v roku 1955 a jeho dominantou je monumentálna budova v tvare pretnutých pyramíd od architekta Dušana Kuzmu (dokončená 1969), doplnená Pamätníkom SNP. Patrí medzi najvýznamnejšie múzeá venované druhej svetovej vojne v strednej Európe.</p>
+        <p>Po celom Slovensku sa nachádzajú desiatky menších pamätníkov pripomínajúcich konkrétne udalosti — vypálené obce (Kľak, Ostrý Grúň, Kalište, Tokajík), miesta popráv (Kremnička, Nemecká) aj bojiská taktických skupín.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: muzeumsnp.sk · Wikipédia</div>
+    </div>
+
+    <h3 class="section-heading">Pretrvávajúce spory o výklad</h3>
+    <div class="article-card">
+      <div class="info-body">
+        <p>Výklad SNP zostáva na Slovensku občas predmetom politických sporov — najmä otázka pomeru zásluh komunistického a demokratického krídla odboja, hodnotenie Slovenského štátu a Tisovho režimu, aj miera, do akej bolo povstanie „za" obnovenie Československa verzus národnú samostatnosť.</p>
+        <p>Historici sa naprieč spektrom zhodujú aspoň na jednom: SNP bolo jedným z najväčších protifašistických ozbrojených vystúpení v okupovanej Európe a jeho účastníci si zaslúžia úctu bez ohľadu na dobové politické rozdelenie.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Denník N · HistoryLab.sk · Ústav pamäti národa</div>
+    </div>
+  </div>
+`;
+
+document.getElementById('page-glossary').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Slovníček pojmov</h2>
+    <p class="page-intro">Skratky a pojmy, ktoré sa na tejto stránke opakovane objavujú, vysvetlené na jednom mieste.</p>
+    <div class="article-card">
+      <div class="info-body">
+        <p><strong>SNP</strong> — Slovenské národné povstanie (29. aug. – 28. okt. 1944, organizovaná fáza).</p>
+        <p><strong>SNR</strong> — Slovenská národná rada, ilegálny a neskôr povstalecký najvyšší politický orgán, vzniknutý na základe Vianočnej dohody z decembra 1943.</p>
+        <p><strong>Rada na obranu Slovenska</strong> — najvyšší koordinačný orgán povstania spájajúci vojenské a politické velenie.</p>
+        <p><strong>Hlavný štáb partizánskych oddielov (HŠPO), neskôr Hlavný štáb partizánskeho hnutia (HŠPH)</strong> — ústredné velenie koordinujúce partizánske jednotky s pravidelnou armádou.</p>
+        <p><strong>Taktická skupina (TS)</strong> — jeden zo šiestich veľkých organizačných celkov, na ktoré bola 10. septembra 1944 rozdelená povstalecká armáda.</p>
+        <p><strong>Východoslovenská armáda (VSA)</strong> — zbor dvoch slovenských divízií na východnom Slovensku, ktoré mali otvoriť Karpaty Červenej armáde; Nemci ich odzbrojili koncom augusta 1944.</p>
+        <p><strong>Karpatsko-duklianska operácia</strong> — sovietsko-československá vojenská operácia (8. sept. – 28. okt. 1944), ktorá sa mala cez Dukliansky priesmyk prebiť na pomoc SNP.</p>
+        <p><strong>Slovenský štát</strong> — oficiálny názov vojnového slovenského štátu (1939 – 1945), spojenca nacistického Nemecka, na čele s prezidentom Jozefom Tisom.</p>
+        <p><strong>Hlinkova garda</strong> — polovojenská zložka jedinej povolenej strany Slovenského štátu; jej Pohotovostné oddiely (POHG) sa podieľali na represáliách po potlačení SNP.</p>
+        <p><strong>Wehrmacht</strong> — ozbrojené sily nacistického Nemecka (armáda, letectvo, námorníctvo).</p>
+        <p><strong>Waffen-SS</strong> — ozbrojené (bojové) jednotky nacistickej organizácie SS, odlišné od pravidelného Wehrmachtu.</p>
+        <p><strong>ZSSR</strong> — Zväz sovietskych socialistických republík (Sovietsky zväz).</p>
+        <p><strong>1. čs. armádny zbor v ZSSR</strong> — československá vojenská jednotka budovaná v Sovietskom zväze, bojujúca pri Dukle pod velením gen. Ludvíka Svobodu.</p>
+        <p><strong>Národný súd</strong> — mimoriadny retribučný súd v povojnovom Československu (1946 – 1947), ktorý súdil predstaviteľov vojnového režimu vrátane Jozefa Tisu.</p>
+        <p><strong>Vianočná dohoda</strong> — dohoda z decembra 1943, ktorou sa spojil komunistický a občiansky (demokratický) odboj do jednotnej Slovenskej národnej rady.</p>
+        <p><strong>Košický vládny program</strong> — základný politický program obnoveného Československa, vyhlásený 5. apríla 1945 v Košiciach.</p>
+      </div>
+      <div class="info-sources">Zdroje informácií: Wikipédia · Ústav pamäti národa · Vojenský historický ústav</div>
+    </div>
+  </div>
+`;
+
+document.getElementById('page-sources').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Zdroje a poznámky k projektu</h2>
+    <p class="page-intro">Táto stránka je vzdelávací projekt zostavený na základe verejne dostupných historických zdrojov. Nejde o akademickú publikáciu — pri presnom výskume odporúčame vždy siahnuť po odbornej literatúre a priamo po Múzeu SNP v Banskej Bystrici.</p>
+
+    <h3 class="section-heading">Použité textové zdroje</h3>
+    <ul class="sources-list">
+      <li><strong>Múzeum SNP</strong>, Banská Bystrica — muzeumsnp.sk</li>
+      <li><strong>Ústav pamäti národa</strong> — upn.gov.sk</li>
+      <li><strong>Vojenský historický ústav</strong> — vhu.sk</li>
+      <li><strong>Ministerstvo obrany SR</strong> — Hrdinovia SNP (mosr.sk)</li>
+      <li><strong>Wikipédia</strong> (slovenská, česká aj anglická verzia) — najmä heslá o SNP, taktických skupinách počas SNP, partizánskych zväzkoch, Východoslovenskej armáde a jednotlivých osobnostiach</li>
+      <li>TASR / teraz.sk, Denník N, Pravda, SME (MY Zvolen), bystricoviny.sk, standard.sk, HistoryLab.sk, noveslovo.sk, sliacdnes.sk</li>
+    </ul>
+
+    <h3 class="section-heading">Fotografie</h3>
+    <p style="font-size:13.5px;line-height:1.7;color:#ddd4b8;">
+      Historické fotografie pochádzajú z Wikimedia Commons a sú buď vo verejnej doméne, alebo pod licenciou Creative Commons — presný zdroj a licencia sú uvedené pod každou fotografiou v jej karte. Fotografie boli doplnené len tam, kde sa dal spoľahlivo overiť konkrétny súbor a jeho licencia; pri ostatných osobnostiach a miestach fotografia zámerne chýba, aby sa predišlo použitiu neovereného alebo nesprávne licencovaného obrázka.
+    </p>
+
+    <h3 class="section-heading">Obmedzenia mapy</h3>
+    <p style="font-size:13.5px;line-height:1.7;color:#ddd4b8;">
+      Hranice frontu sú zjednodušené a orientačné rekonštrukcie — slúžia na pochopenie priebehu bojov, nie ako presná vojenská kartografia. Polohy niektorých bodov (najmä v horských oblastiach bez presnej adresy) sú približné. Mapové podklady pochádzajú z OpenStreetMap (cez dlaždice CARTO), © prispievatelia OpenStreetMap.
+    </p>
+  </div>
+`;
+
+/* --- spracovanie odkazu pri prvom načítaní stránky (napr. povstanie44.sk/#reprisals/klak) --- */
+routeFromHash();
+</script>
+</body>
+</html>
