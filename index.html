@@ -446,7 +446,7 @@ h1 em{
 .map-modal .info-body{color:#e2d9bd;}
 
 /* ---------- ZNAČKY (Leaflet divIcon) ---------- */
-.lm-icon-wrap{background:transparent; border:none;}
+.lm-icon-wrap,.lm-icon-wrap.leaflet-interactive{background:transparent; border:none; pointer-events:none;}
 .lm-wrap{
   position:relative;
   width:150px; height:100%;
@@ -470,6 +470,17 @@ h1 em{
   overflow:visible;
 }
 .lm-shape svg{display:block; flex:none;}
+.lm-photo{
+  width:100%; height:100%;
+  object-fit:cover;
+  border-radius:50%;
+  display:block;
+  filter:grayscale(18%) sepia(10%) contrast(1.04);
+}
+.lm-shape.has-photo{
+  background:#15150f;
+  overflow:hidden;
+}
 .lm-circle{border-radius:50%;}
 .lm-diamond{transform:translateY(-50%) rotate(45deg); border-radius:2px;}
 .lm-square{border-radius:2px; border-style:dashed;}
@@ -1922,7 +1933,7 @@ function unitEmblemSVG(type, sizePx){
 }
 
 function iconFor(m, selected){
-  const size = SIZES[m.type];
+  const size = m.photo ? 30 : SIZES[m.type];
   const cls = shapeClassFor(m.type);
   const color = COLORS[m.type];
   const fill = (m.type==="ts" || m.type==="town" || m.type==="burned" || m.type==="exec") ? "#15150f" : color;
@@ -1933,12 +1944,15 @@ function iconFor(m, selected){
   else if(m.type==="burned") labelStyle = "color:#e08a5c;font-size:9.5px;font-style:italic;";
   else if(m.type==="exec") labelStyle = "color:#c77a7a;font-size:9.5px;";
   else if(m.type==="airfield") labelStyle = "color:#a9d9ee;font-size:9.5px;";
-  const emblem = unitEmblemSVG(m.type, size);
+  const emblem = m.photo
+    ? `<img class="lm-photo" src="${wikiFilePath(m.photo.file)}" alt="${m.name}" loading="lazy" onerror="this.style.display='none'">`
+    : unitEmblemSVG(m.type, size);
+  const photoCls = m.photo ? " has-photo" : "";
   return L.divIcon({
     className:"lm-icon-wrap",
     html:`
       <div class="lm-wrap${selCls}" data-id="${m.id}">
-        <div class="lm-shape ${cls}" style="--s:${size}px;--c:${color};--f:${fill}">${emblem}</div>
+        <div class="lm-shape ${cls}${photoCls}" style="--s:${size}px;--c:${color};--f:${fill}">${emblem}</div>
         <span class="lm-label" style="${labelStyle}">${label}</span>
       </div>`,
     iconSize:[150, size],
@@ -1950,8 +1964,30 @@ const markerLayer = L.layerGroup().addTo(map);
 const leafletMarkers = {};
 let selectedId = null;
 
+// Značky s rovnakým sídlom rozložíme okolo skutočnej lokality, aby boli všetky klikateľné.
+const markerLocations = new Map();
+const markerGroups = new Map();
 ALL_MARKERS.forEach(m=>{
-  const mk = L.marker(m.loc, { icon: iconFor(m, false) });
+  const key = `${m.loc[0].toFixed(4)},${m.loc[1].toFixed(4)}`;
+  if(!markerGroups.has(key)) markerGroups.set(key, []);
+  markerGroups.get(key).push(m);
+});
+markerGroups.forEach(group=>{
+  group.forEach((m, index)=>{
+    if(group.length === 1){
+      markerLocations.set(m.id, m.loc);
+      return;
+    }
+    const angle = -Math.PI / 2 + (index / group.length) * Math.PI * 2;
+    const radius = .5;
+    const lat = m.loc[0] + Math.sin(angle) * radius;
+    const lon = m.loc[1] + Math.cos(angle) * radius / Math.cos(m.loc[0] * Math.PI / 180);
+    markerLocations.set(m.id, [lat, lon]);
+  });
+});
+
+ALL_MARKERS.forEach(m=>{
+  const mk = L.marker(markerLocations.get(m.id) || m.loc, { icon: iconFor(m, false) });
   mk.on('click', ()=> selectMarker(m.id));
   mk.addTo(markerLayer);
   leafletMarkers[m.id] = mk;
