@@ -484,6 +484,8 @@ h1 em{
 .lm-circle{border-radius:50%;}
 .lm-diamond{transform:translateY(-50%) rotate(45deg); border-radius:2px;}
 .lm-square{border-radius:2px; border-style:dashed;}
+.lm-train{border-radius:3px; border-width:2px;}
+.lm-battle{border-radius:50%; clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 94%,50% 72%,21% 94%,32% 57%,2% 35%,39% 35%);}
 .lm-wrap:hover .lm-shape{box-shadow:0 0 0 6px rgba(219,183,102,.28);}
 .lm-selected .lm-shape{box-shadow:0 0 0 5px rgba(255,255,255,.55) !important;}
 .lm-inactive{opacity:.28;}
@@ -906,6 +908,7 @@ footer.note{
     <button class="nav-btn" data-page="tactical">Taktické skupiny</button>
     <button class="nav-btn" data-page="partisans">Partizáni a Nemci</button>
     <button class="nav-btn" data-page="places">Mestá a letiská</button>
+    <button class="nav-btn" data-page="battles">Vlaky a bitky</button>
     <button class="nav-btn" data-page="reprisals">Represálie</button>
     <button class="nav-btn" data-page="aftermath">Bilancia a dôsledky</button>
     <button class="nav-btn" data-page="memory">Pamäť dnes</button>
@@ -950,6 +953,8 @@ footer.note{
           <span data-type="burned"><i class="dot" style="background:#c1602f"></i>Vypálená obec</span>
           <span data-type="exec"><i class="dot" style="background:#7a2a2a"></i>Miesto popravy</span>
           <span data-type="person"><i class="dot" style="background:#a690c4"></i>Osobnosť SNP</span>
+          <span data-type="train"><i class="dot" style="background:#e0a14b"></i>Pancierový vlak</span>
+          <span data-type="battle"><i class="dot" style="background:#e05b3f"></i>Dôležitá bitka</span>
           <span class="legend-hint">Klik na farebné územie = vysvetlenie · klik na ikonku vyššie = filter</span>
         </div>
       </div>
@@ -1021,6 +1026,7 @@ footer.note{
   <section class="page article-page" id="page-tactical"></section>
   <section class="page article-page" id="page-partisans"></section>
   <section class="page article-page" id="page-places"></section>
+  <section class="page article-page" id="page-battles"></section>
   <section class="page article-page" id="page-reprisals"></section>
   <section class="page article-page" id="page-aftermath"></section>
   <section class="page article-page" id="page-memory"></section>
@@ -1458,6 +1464,19 @@ const KEY_TOWNS = [
     bio:["Kľúčový uzol Horehronia, odkiaľ sa riadila obrana priesmykov Čertovica a okolia Telgártu na východnom krídle frontu."]
   },
   {
+    id:"t-telgart", type:"town",
+    name:"Telgárt",
+    role:"Dvakrát bojisko: 5. – 9. a 18. – 23. septembra 1944",
+    from:"1944-08-29", to:"1944-10-27",
+    loc:P(48.8483,20.1900),
+    bio:[
+      "Telgárt bol strategickým bodom na východnom krídle povstaleckého územia. Cez Horehronie a sedlo Besník viedli prístupy zo Spiša smerom k Breznu a Banskej Bystrici, preto sa o obec a jej okolie počas SNP bojovalo v dvoch výrazných etapách.",
+      "Prvá bitka prebiehala 5. – 9. septembra 1944. Nemecké jednotky obsadili Telgárt 4. septembra, no na druhý deň povstalci zaútočili s podporou delostrelectva, tankov LT vz. 38 a partizánov. Počas bojov vypukol v obci požiar a Telgárt bol prakticky zničený. Povstalci následne zastavili nemecký postup pri telgártskom tuneli a front sa 9. septembra stabilizoval východne od pôvodnej línie.",
+      "Druhá bitka, presnejšie povstalecký protiútok, prebiehala 18. – 23. septembra. Po oslabení nemeckých síl v súvislosti s Karpatsko-duklianskou operáciou zaútočili jednotky skupiny Jánošík a II. taktickej skupiny Plesnivec. 21. septembra obsadili Besník a telgártsky tunel, potom postúpili cez Pusté Pole smerom k Vernáru, Hranovnici a Podlesku. Tým zatlačili nemeckú obranu ďalej od Horehronia a na čas odrezali prístupy zo Spiša.",
+      "Boje pri Telgárte patrili k najúspešnejším povstaleckým akciám, hoci neskôr sa ich rozsah a straty v pamätiach a propagandistických správach často nadsadzovali. Úsek Plesnivec zostal pokojnejší až do generálnej nemeckej ofenzívy od 18. októbra, keď sa tlak na východné krídlo obnovil."
+    ]
+  },
+  {
     id:"t-prievidza", type:"town",
     name:"Prievidza",
     role:"Front proti bojovej skupine Schill",
@@ -1557,6 +1576,50 @@ const AIRFIELDS = [
       "Pre rozmočenú trávnatú plochu po vydatných dažďoch sa 12. októbra 1944 peruť presunula na spevnenú plochu na Troch Duboch, kde mohla bezpečne fungovať za každého počasia."
     ]
   }
+];
+
+/* --- improvizované pancierové vlaky --- */
+const ARMORED_TRAINS = [
+  {
+    id:"masaryk", type:"train", name:"Pancierový vlak Masaryk",
+    role:"IPV III · veliteľ kpt. J. Kukliš",
+    from:"1944-10-13", to:"1944-10-27", loc:P(48.8058,19.6408), hq:"Zvolen → Horehronie",
+    bio:[
+      "Tretí a technicky najdokonalejší z trojice povstaleckých pancierových vlakov, postavený v železničných dielňach vo Zvolene. Do bojov vstúpil až v októbri, keď už bola obrana povstania pod silným tlakom.",
+      "Po opravách 24. októbra sa presunul k Pohorelskej Maši a podporil útok na Vaľkovňu. Delostreleckou paľbou spomaľoval nemecký postup, no po zásahoch lokomotívy a vyčerpaní munície bol odtiahnutý cez Brezno a Banskú Bystricu.",
+      "26. októbra ešte podporoval pechotu medzi Horným Harmancom a tunelom Čremošné. Po páde Banskej Bystrice sa stiahol do Horného Harmanca a posádka vlak odzbrojila."
+    ]
+  },
+  {
+    id:"hurban", type:"train", name:"Pancierový vlak Hurban",
+    role:"IPV II · veliteľ kpt. Martin Ďuriš-Rubanský",
+    from:"1944-10-01", to:"1944-10-27", loc:P(48.733,19.45), hq:"Čremošné → Heľpa → Harmanec",
+    bio:[
+      "Druhý improvizovaný pancierový vlak, vyrobený v zvolenských železničných dielňach. Jeho výzbroj tvorili okrem delového a guľometného vozňa aj tankové vozne s vežami z tankov LT vz. 35.",
+      "Prvýkrát zasiahol do bojov na trati Hronská Dúbrava – Svätý Kríž nad Hronom. Najťažšie boje absolvoval 5. októbra pri Čremošnom, kde pomáhal zastaviť postup nemeckej divízie Tatra a kryl obranu Malého Šturca.",
+      "23. októbra kryl ústup povstalcov na Horehroní a účinne zasiahol pri Heľpe. Neskôr ustúpil k Harmancu a v Čremošnianskom tuneli bol po páde frontu odzbrojený."
+    ]
+  },
+  {
+    id:"stefanik", type:"train", name:"Pancierový vlak Štefánik",
+    role:"IPV I · veliteľ kpt. František Adam",
+    from:"1944-09-18", to:"1944-10-27", loc:P(48.6206,19.2419), hq:"Zolná → Kremnica → Dobrá Niva",
+    bio:[
+      "Prvý dokončený povstalecký pancierový vlak, pomenovaný po Milanovi Rastislavovi Štefánikovi. Postavili ho vo Zvolene za štrnásť dní a do služby bol zaradený 18. septembra 1944.",
+      "4. a 5. októbra bojoval pri Starej Kremničke a Trnavej Hore, kde prekvapivou paľbou spomalil nemecký postup. Po nálete 6. októbra sa presunul na opravu do Zvolena.",
+      "V druhej polovici októbra podporoval obranu Dobrej Nivy a pri kóte 463 zastavoval nemecký postup od Krupiny. Po poškodení trate a ústupe k Vígľašu kryl odsun materiálu; po páde povstania bola posádka nútená vlak odzbrojiť pri Ulmanke."
+    ]
+  }
+];
+
+/* --- významné bitky a bojové operácie --- */
+const BATTLES = [
+  {id:"battle-telgart", type:"battle", name:"Boje o Telgárt", role:"5. – 9. a 18. – 23. september 1944", from:"1944-09-05", to:"1944-09-23", loc:P(48.8483,20.1900), hq:"Telgárt · Besník · Pusté Pole", bio:["Dvojfázové boje na východnom krídle SNP. Povstalci najprv zastavili nemecký postup pri Telgárte a potom v protiútoku obsadili Besník a telgártsky tunel, čím zatlačili nemeckú obranu smerom k Hranovnici a Podlesku."]},
+  {id:"battle-strecno", type:"battle", name:"Obrana Strečnianskej tiesňavy", role:"31. august – 5. september 1944", from:"1944-08-31", to:"1944-09-05", loc:P(49.2214,18.8523), hq:"Strečno · Vrútky", bio:["Povstalci bránili strategickú tiesňavu proti nemeckej bojovej skupine Tatra. Obrana spomalila postup k Turcu a umožnila sformovanie povstaleckých jednotiek v ďalších úsekoch."]},
+  {id:"battle-cremosne", type:"battle", name:"Bitka pri Čremošnom", role:"4. – 5. október 1944", from:"1944-10-04", to:"1944-10-05", loc:P(48.733,19.45), hq:"Čremošné · Malý Šturc", bio:["Ťažké boje na prístupe k Banskej Bystrici. Povstalecká obrana s podporou pancierového vlaku Hurban a obrneného vlaku Štefánik spôsobila nemeckej divízii Tatra výrazné problémy."]},
+  {id:"battle-dobra-niva", type:"battle", name:"Boje pri Dobrej Nive", role:"18. – 21. október 1944", from:"1944-10-18", to:"1944-10-21", loc:P(48.5607,19.1000), hq:"Dobrá Niva · kóta 463", bio:["Po začiatku generálnej nemeckej ofenzívy pancierový vlak Štefánik podporoval obranu Dobrej Nivy a pokusy spomaliť postup skupiny Schill smerom na Zvolen."]},
+  {id:"battle-pohorela", type:"battle", name:"Boje na Horehroní", role:"23. – 26. október 1944", from:"1944-10-23", to:"1944-10-26", loc:P(48.85,20.08), hq:"Heľpa · Pohorelská Maša · Vaľkovňa", bio:["Záverečné boje na východnom krídle, v ktorých pancierové vlaky Hurban a Masaryk kryli ústup povstaleckých jednotiek a spomaľovali nemecký tlak smerom k Banskej Bystrici."]},
+  {id:"battle-bystrica", type:"battle", name:"Pád Banskej Bystrice", role:"27. október 1944", from:"1944-10-27", to:"1944-10-27", loc:P(48.7395,19.1535), hq:"Banská Bystrica", bio:["Nemecké jednotky obsadili centrum povstania. Organizovaný front sa rozpadol a velenie vydalo rozkaz prejsť na partizánsky spôsob boja v horách."]},
 ];
 
 /* --- vypálené obce (represálie po potlačení SNP) --- */
@@ -1715,7 +1778,7 @@ const PERSONALITIES = [
   }
 ];
 
-const ALL_MARKERS = [...COMMANDERS, ...TACTICAL_GROUPS, ...PARTISANS, ...GERMAN_GROUPS, ...GOVERNMENT, ...VSA, ...KEY_TOWNS, ...AIRFIELDS, ...BURNED_VILLAGES, ...EXECUTION_SITES, ...PERSONALITIES];
+const ALL_MARKERS = [...COMMANDERS, ...TACTICAL_GROUPS, ...PARTISANS, ...GERMAN_GROUPS, ...GOVERNMENT, ...VSA, ...KEY_TOWNS, ...AIRFIELDS, ...ARMORED_TRAINS, ...BATTLES, ...BURNED_VILLAGES, ...EXECUTION_SITES, ...PERSONALITIES];
 
 /* --- orientačné pohybové trasy ---
    Body zachytávajú hlavné presuny, nie presnú každodennú polohu jednotiek.
@@ -1780,6 +1843,25 @@ const MOVEMENT_ROUTES = {
     ["1944-10-04",P(48.95,19.05)],
     ["1944-10-27",P(48.7395,19.1535)],
   ],
+  masaryk:[
+    ["1944-10-13",P(48.5763,19.1338)],
+    ["1944-10-24",P(48.85,20.08)],
+    ["1944-10-26",P(48.95,19.05)],
+    ["1944-10-27",P(48.90,19.00)],
+  ],
+  hurban:[
+    ["1944-10-01",P(48.6378,19.1342)],
+    ["1944-10-05",P(48.733,19.45)],
+    ["1944-10-23",P(48.85,20.08)],
+    ["1944-10-27",P(48.95,19.05)],
+  ],
+  stefanik:[
+    ["1944-09-18",P(48.6206,19.2419)],
+    ["1944-10-05",P(48.7115,18.9236)],
+    ["1944-10-20",P(48.5607,19.1000)],
+    ["1944-10-25",P(48.5763,19.1338)],
+    ["1944-10-27",P(48.7395,19.1535)],
+  ],
 };
 
 /* --- udalosti (denník) --- */
@@ -1795,7 +1877,9 @@ const EVENTS = [
   ["1944-09-04","Po demisii časti ministrov menuje prezident Tiso v Bratislave nový kabinet na čele so Štefanom Tisom. Minister Čatloš z Bratislavy uniká smerom k odbojovému územiu."],
   ["1944-09-07","Karol Šmidke je menovaný náčelníkom Hlavného štábu partizánskych oddielov."],
   ["1944-09-08","Začína Karpatsko-duklianska operácia 1. československého armádneho zboru a Červenej armády — pokus prebiť sa cez Dukliansky priesmyk na pomoc SNP."],
+  ["1944-09-05","Začína sa hlavný povstalecký útok na Telgárt. Po bojoch s podporou tankov, delostrelectva a partizánov povstalci zatlačia nemecké jednotky k telgártskemu tunelu; obec počas bojov vyhorí."],
   ["1944-09-20","Sovietske a československé jednotky po ťažkých bojoch dobýjajú mesto Dukla v Poľsku a postupujú k rovnomennému priesmyku."],
+  ["1944-09-21","V druhej fáze bojov pri Telgárte povstalci obsadzujú Besník a telgártsky tunel a postupujú cez Pusté Pole smerom k Vernáru, Hranovnici a Podlesku."],
   ["1944-09-10","Povstalecká armáda je reorganizovaná na šesť taktických skupín: Kriváň, Fatra, Gerlach, Muráň, Ďumbier a Zobor."],
   ["1944-09-11","Bojová skupina Schill prelamuje obranu IV. taktickej skupiny pri Zemianskych Kostoľanoch."],
   ["1944-09-14","Plukovník Mikuláš Markus preberá velenie IV. taktickej skupiny „Muráň“."],
@@ -1943,18 +2027,22 @@ document.getElementById("germanOccToggle").addEventListener("change",(e)=>{
 });
 
 
-const COLORS = {cmd:"#dab766", ts:"#e9e1c9", pz:"#63938e", de:"#a9a9a9", govt:"#c1504a", vsa:"#7fa0bd", town:"#cbb97a", airfield:"#7ec8e3", burned:"#c1602f", exec:"#7a2a2a", person:"#a690c4"};
-const SIZES  = {cmd:16, ts:15, pz:15, de:13, govt:16, vsa:16, town:11, airfield:15, burned:11, exec:12, person:13};
+const COLORS = {cmd:"#dab766", ts:"#e9e1c9", pz:"#63938e", de:"#a9a9a9", govt:"#c1504a", vsa:"#7fa0bd", town:"#cbb97a", airfield:"#7ec8e3", burned:"#c1602f", exec:"#7a2a2a", person:"#a690c4", train:"#e0a14b", battle:"#e05b3f"};
+const SIZES  = {cmd:16, ts:15, pz:15, de:13, govt:16, vsa:16, town:11, airfield:15, burned:11, exec:12, person:13, train:20, battle:22};
 
 function shapeClassFor(type){
   if(type==="ts") return "lm-diamond";
   if(type==="town" || type==="burned" || type==="exec") return "lm-square";
+  if(type==="train") return "lm-train";
+  if(type==="battle") return "lm-battle";
   return "lm-circle";
 }
 function labelFor(m){
   if(m.type==="cmd" || m.type==="govt") return m.name.split(" ").pop();
   if(m.type==="ts") return "TS "+m.number;
   if(m.type==="vsa") return "VSA";
+  if(m.type==="train") return "vlak "+m.name.split(" ").pop();
+  if(m.type==="battle") return "⚔ "+m.name;
   if(m.type==="town" || m.type==="airfield" || m.type==="burned" || m.type==="exec") return m.name;
   return m.name.split(" ").slice(-1)[0];
 }
@@ -1967,7 +2055,7 @@ function labelFor(m){
    ani chránené symboly (výslovne bez hákového kríža). */
 function unitEmblemSVG(type, sizePx){
   const s = Math.max(10, Math.round(sizePx * 0.62));
-  const iconColors = { cmd:"#241b09", ts:"var(--parchment)", vsa:"#0e1e2b", de:"#232323", pz:"#f4efe2" };
+  const iconColors = { cmd:"#241b09", ts:"var(--parchment)", vsa:"#0e1e2b", de:"#232323", pz:"#f4efe2", train:"#241b09", battle:"#fff1d0" };
   const col = iconColors[type];
   if(!col) return "";
 
@@ -1985,6 +2073,10 @@ function unitEmblemSVG(type, sizePx){
   } else if(type==="pz"){
     // päťcípa hviezda — partizánske oddiely
     inner = `<path d="M12,2.4 L14.6,9.1 L21.7,9.4 L16.1,13.9 L18,20.9 L12,16.9 L6,20.9 L7.9,13.9 L2.3,9.4 L9.4,9.1 Z" fill="${col}"/>`;
+  } else if(type==="train"){
+    inner = `<rect x="3" y="5" width="18" height="11" rx="2" fill="${col}"/><rect x="6" y="8" width="4" height="3" fill="#e0a14b"/><rect x="14" y="8" width="4" height="3" fill="#e0a14b"/><circle cx="7" cy="19" r="2" fill="${col}"/><circle cx="17" cy="19" r="2" fill="${col}"/>`;
+  } else if(type==="battle"){
+    inner = `<path d="M12 3 L14.2 9.2 L20.8 9.3 L15.5 13.2 L17.4 19.5 L12 15.7 L6.6 19.5 L8.5 13.2 L3.2 9.3 L9.8 9.2 Z" fill="${col}"/>`;
   }
   const rotateFix = type==="ts" ? ' style="transform:rotate(-45deg)"' : '';
   return `<svg viewBox="0 0 24 24" width="${s}" height="${s}"${rotateFix} aria-hidden="true">${inner}</svg>`;
@@ -2002,6 +2094,8 @@ function iconFor(m, selected){
   else if(m.type==="burned") labelStyle = "color:#e08a5c;font-size:9.5px;font-style:italic;";
   else if(m.type==="exec") labelStyle = "color:#c77a7a;font-size:9.5px;";
   else if(m.type==="airfield") labelStyle = "color:#a9d9ee;font-size:9.5px;";
+  else if(m.type==="train") labelStyle = "color:#f1bf6b;font-size:9.5px;font-weight:700;";
+  else if(m.type==="battle") labelStyle = "color:#f08062;font-size:9.5px;font-weight:700;";
   const emblem = m.photo
     ? `<img class="lm-photo" src="${wikiFilePath(m.photo.file)}" alt="${m.name}" loading="lazy" onerror="this.style.display='none'">`
     : unitEmblemSVG(m.type, size);
@@ -2196,7 +2290,7 @@ territoryPolygon.bringToFront();
 const infoPanel = document.getElementById("infoPanel");
 
 function kickerFor(type){
-  return {cmd:"Velenie povstania", ts:"Taktická skupina", pz:"Partizánsky oddiel", de:"Nemecká jednotka", govt:"Vedenie Slovenského štátu", vsa:"Východoslovenská armáda", town:"Dôležité miesto", airfield:"Letisko / vzdušný most", burned:"Vypálená obec", exec:"Miesto masovej popravy", person:"Osobnosť SNP"}[type];
+  return {cmd:"Velenie povstania", ts:"Taktická skupina", pz:"Partizánsky oddiel", de:"Nemecká jednotka", govt:"Vedenie Slovenského štátu", vsa:"Východoslovenská armáda", town:"Dôležité miesto", airfield:"Letisko / vzdušný most", burned:"Vypálená obec", exec:"Miesto masovej popravy", person:"Osobnosť SNP", train:"Pancierový vlak", battle:"Dôležitá bitka"}[type];
 }
 
 const mapModalBackdrop = document.getElementById("mapModalBackdrop");
@@ -2222,6 +2316,8 @@ function sourcesLineFor(type){
     burned:"Wikipédia — Zoznam vypálených obcí na Slovensku · TASR / teraz.sk · Múzeum SNP",
     exec:"Wikipédia — Masaker v Kremničke · bystricoviny.sk · standard.sk",
     person:"Denník N — 10 tvárí SNP · HistoryLab.sk · Národná banka Slovenska · Pravda.sk · Wikipédia",
+    train:"Wikipédia — Pancierový vlak Masaryk, Hurban a Štefánik · Múzeum SNP",
+    battle:"Wikipédia — Boje o Telgárt · Bitka pri Čremošnom · Ústav pamäti národa",
   };
   return map[type] || "Múzeum SNP · Ústav pamäti národa · Wikipédia";
 }
@@ -2516,6 +2612,7 @@ function pageForType(type){
   if(type==='ts') return 'tactical';
   if(type==='pz' || type==='de') return 'partisans';
   if(type==='town' || type==='airfield') return 'places';
+  if(type==='train' || type==='battle') return 'battles';
   if(type==='burned' || type==='exec') return 'reprisals';
   return 'map';
 }
@@ -2693,6 +2790,19 @@ document.getElementById('page-places').innerHTML = `
 
     <h3 class="section-heading">Letiská a vzdušný most</h3>
     ${AIRFIELDS.map(articleCardHTML).join('')}
+  </div>
+`;
+
+document.getElementById('page-battles').innerHTML = `
+  <div class="article-page-inner">
+    <h2 class="page-title">Pancierové vlaky a kľúčové bitky</h2>
+    <p class="page-intro">Tri improvizované pancierové vlaky predstavovali najťažšiu mobilnú výzbroj povstaleckej armády. Na mape ich oranžové ikonky ukazujú hlavné bojové presuny; hviezdicové značky označujú miesta rozhodujúcich stretov.</p>
+
+    <h3 class="section-heading">Pancierové vlaky</h3>
+    ${ARMORED_TRAINS.map(articleCardHTML).join('')}
+
+    <h3 class="section-heading">Dôležité bitky</h3>
+    ${BATTLES.map(articleCardHTML).join('')}
   </div>
 `;
 
