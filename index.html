@@ -1818,27 +1818,27 @@ const PHASES = [
   {
     from:"1944-08-29", to:"1944-09-09",
     label:"Počiatočné povstalecké územie",
-    pts:[[434,145],[439,211],[606,217],[575,237],[581,347],[822,326],[787,409],[713,410],[705,453],[667,483],[330,572],[362,462],[271,395],[196,387],[140,364],[270,217]]
+    pts:[[49.35,18.10],[49.45,19.00],[49.35,20.40],[49.05,20.80],[48.75,20.80],[48.35,19.80],[48.20,19.00],[48.35,18.20],[48.80,18.00]]
   },
   {
     from:"1944-09-10", to:"1944-09-30",
     label:"Územie po reorganizácii na 6 taktických skupín (10. sept.)",
-    pts:[[270,217],[439,211],[606,217],[575,237],[581,347],[822,326],[787,409],[713,410],[705,453],[667,483],[330,572],[362,462],[271,395],[222,378]]
+    pts:[[49.30,18.25],[49.40,19.00],[49.30,20.20],[49.00,20.60],[48.70,20.55],[48.35,19.75],[48.25,19.05],[48.40,18.35],[48.80,18.10]]
   },
   {
     from:"1944-10-01", to:"1944-10-15",
     label:"Zmenšujúce sa územie — tlak od západu a severu",
-    pts:[[300,260],[439,211],[606,217],[575,237],[581,347],[822,326],[787,409],[713,410],[705,453],[667,483],[330,572],[362,462],[300,410]]
+    pts:[[49.20,18.45],[49.30,19.65],[49.15,20.05],[48.90,20.20],[48.65,19.80],[48.45,19.35],[48.50,18.85],[48.75,18.50]]
   },
   {
     from:"1944-10-16", to:"1944-10-26",
     label:"Posledná obranná línia okolo Banskej Bystrice",
-    pts:[[360,300],[500,300],[581,347],[600,410],[500,460],[400,462],[330,450],[340,360]]
+    pts:[[49.02,18.75],[49.10,19.40],[48.95,19.75],[48.72,19.65],[48.55,19.35],[48.58,18.95],[48.78,18.70]]
   },
   {
     from:"1944-10-27", to:"1944-10-27",
     label:"Pád Banskej Bystrice — front sa rozpadá",
-    pts:[[400,340],[460,340],[470,390],[420,400],[390,375]]
+    pts:[[48.86,18.95],[48.92,19.35],[48.78,19.48],[48.62,19.32],[48.66,19.05]]
   },
   {
     from:"1944-10-28", to:"1944-10-30",
@@ -1846,13 +1846,6 @@ const PHASES = [
     pts:[]
   },
 ];
-
-// PHASES boli pôvodne autorované v súradniciach pomocnej mapy len pre
-// stredné Slovensko. Prepočítame ich na skutočné zemepisné súradnice
-// (lat, lon), aby sa dali vykresliť ako polygón priamo na OpenStreetMape.
-PHASES.forEach(ph=>{
-  ph.pts = ph.pts.map(([x,y])=> invOldProj(x,y)); // => [lat,lon]
-});
 
 function phaseForDate(d){
   for(const ph of PHASES){
@@ -2030,30 +2023,9 @@ const leafletMarkers = {};
 let selectedId = null;
 
 // Značky s rovnakým sídlom rozložíme okolo skutočnej lokality, aby boli všetky klikateľné.
-const markerLocations = new Map();
-const markerGroups = new Map();
-ALL_MARKERS.forEach(m=>{
-  const key = `${m.loc[0].toFixed(4)},${m.loc[1].toFixed(4)}`;
-  if(!markerGroups.has(key)) markerGroups.set(key, []);
-  markerGroups.get(key).push(m);
-});
-markerGroups.forEach(group=>{
-  group.forEach((m, index)=>{
-    if(group.length === 1){
-      markerLocations.set(m.id, m.loc);
-      return;
-    }
-    const angle = -Math.PI / 2 + (index / group.length) * Math.PI * 2;
-    const radius = .5;
-    const lat = m.loc[0] + Math.sin(angle) * radius;
-    const lon = m.loc[1] + Math.cos(angle) * radius / Math.cos(m.loc[0] * Math.PI / 180);
-    markerLocations.set(m.id, [lat, lon]);
-  });
-});
-
 function positionForDate(m, currentDate){
   const route = MOVEMENT_ROUTES[m.id];
-  if(!route || !route.length) return markerLocations.get(m.id) || m.loc;
+  if(!route || !route.length) return m.loc;
   if(currentDate <= D(route[0][0])) return route[0][1];
   if(currentDate >= D(route[route.length-1][0])) return route[route.length-1][1];
   for(let index=1; index<route.length; index++){
