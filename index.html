@@ -1717,6 +1717,71 @@ const PERSONALITIES = [
 
 const ALL_MARKERS = [...COMMANDERS, ...TACTICAL_GROUPS, ...PARTISANS, ...GERMAN_GROUPS, ...GOVERNMENT, ...VSA, ...KEY_TOWNS, ...AIRFIELDS, ...BURNED_VILLAGES, ...EXECUTION_SITES, ...PERSONALITIES];
 
+/* --- orientačné pohybové trasy ---
+   Body zachytávajú hlavné presuny, nie presnú každodennú polohu jednotiek.
+   Medzi dátumami sa poloha plynulo interpoluje podľa časovej osi. */
+const MOVEMENT_ROUTES = {
+  golian:[
+    ["1944-08-29",P(48.7395,19.1535)],
+    ["1944-10-06",P(48.8058,19.6408)],
+    ["1944-10-27",P(48.9436,19.5814)],
+  ],
+  viest:[
+    ["1944-10-07",P(48.7395,19.1535)],
+    ["1944-10-27",P(48.9436,19.5814)],
+  ],
+  ts1:[
+    ["1944-09-10",P(48.7395,19.1535)],
+    ["1944-10-04",P(48.733,19.45)],
+    ["1944-10-27",P(48.9436,19.5814)],
+  ],
+  ts2:[
+    ["1944-09-10",P(48.8058,19.6408)],
+    ["1944-10-18",P(48.8483,20.1900)],
+    ["1944-10-27",P(48.9436,19.5814)],
+  ],
+  ts3:[
+    ["1944-09-10",P(48.5763,19.1338)],
+    ["1944-10-18",P(48.3549,19.0602)],
+    ["1944-10-27",P(48.7395,19.1535)],
+  ],
+  ts4:[
+    ["1944-09-14",P(48.7712,18.6229)],
+    ["1944-10-23",P(48.7180,18.5591)],
+    ["1944-10-27",P(48.9436,19.5814)],
+  ],
+  ts5:[
+    ["1944-09-10",P(49.2214,18.8523)],
+    ["1944-10-04",P(48.95,19.05)],
+    ["1944-10-27",P(48.9436,19.5814)],
+  ],
+  ts6:[
+    ["1944-09-10",P(49.0775,19.3096)],
+    ["1944-10-18",P(49.0672,19.6931)],
+    ["1944-10-27",P(48.9436,19.5814)],
+  ],
+  nevskij:[
+    ["1944-09-10",P(48.90,20.90)],
+    ["1944-09-24",P(48.75,19.30)],
+    ["1944-10-28",P(48.9436,19.5814)],
+  ],
+  schill:[
+    ["1944-09-10",P(48.7712,18.6229)],
+    ["1944-09-22",P(48.70,18.65)],
+    ["1944-10-27",P(48.7395,19.1535)],
+  ],
+  schafer:[
+    ["1944-09-01",P(49.2103,19.2984)],
+    ["1944-10-18",P(49.08,19.05)],
+    ["1944-10-27",P(48.7395,19.1535)],
+  ],
+  tatra:[
+    ["1944-09-01",P(49.2214,18.8523)],
+    ["1944-10-04",P(48.95,19.05)],
+    ["1944-10-27",P(48.7395,19.1535)],
+  ],
+};
+
 /* --- udalosti (denník) --- */
 const EVENTS = [
   ["1944-08-25","Golian vydáva tajnú inštrukciu posádkam o ozbrojenom odpore, ak nemecké vojská prekročia hranice štátu."],
@@ -1986,8 +2051,28 @@ markerGroups.forEach(group=>{
   });
 });
 
+function positionForDate(m, currentDate){
+  const route = MOVEMENT_ROUTES[m.id];
+  if(!route || !route.length) return markerLocations.get(m.id) || m.loc;
+  if(currentDate <= D(route[0][0])) return route[0][1];
+  if(currentDate >= D(route[route.length-1][0])) return route[route.length-1][1];
+  for(let index=1; index<route.length; index++){
+    const [toDate, toPoint] = route[index];
+    const [fromDate, fromPoint] = route[index-1];
+    if(currentDate <= D(toDate)){
+      const span = D(toDate) - D(fromDate);
+      const progress = (currentDate - D(fromDate)) / span;
+      return [
+        fromPoint[0] + (toPoint[0] - fromPoint[0]) * progress,
+        fromPoint[1] + (toPoint[1] - fromPoint[1]) * progress,
+      ];
+    }
+  }
+  return route[route.length-1][1];
+}
+
 ALL_MARKERS.forEach(m=>{
-  const mk = L.marker(markerLocations.get(m.id) || m.loc, { icon: iconFor(m, false) });
+  const mk = L.marker(positionForDate(m, START), { icon: iconFor(m, false) });
   mk.on('click', ()=> selectMarker(m.id));
   mk.addTo(markerLayer);
   leafletMarkers[m.id] = mk;
@@ -2241,7 +2326,7 @@ function selectMarker(id){
   const m = ALL_MARKERS.find(x=>x.id===id);
   if(!m) return;
 
-  map.panTo(m.loc, {animate:true});
+  map.panTo(positionForDate(m, dateAt(+slider.value)), {animate:true});
 
   // bočný panel
   infoPanel.innerHTML = cardHTML(m, "closeInfo");
@@ -2278,6 +2363,7 @@ function refreshMarkerStates(){
     const active = currentDate >= D(m.from) && currentDate <= D(m.to);
     const filteredOut = hiddenTypes.has(m.type);
     const mk = leafletMarkers[m.id];
+    mk.setLatLng(positionForDate(m, currentDate));
     mk.setIcon(iconFor(m, m.id===selectedId));
     const el = mk.getElement();
     if(el){
